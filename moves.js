@@ -124,3 +124,12 @@ export const rookMoves = (position, rank, file, piece) => {
 
   return moves;
 };
+
+export const queenMoves = (position, rank, file, piece) => {
+  const moves = [
+    ...bishopMoves(position, rank, file, piece),
+    ...rookMoves(position, rank, file, piece),
+  ];
+
+  return moves;
+};
