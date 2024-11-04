@@ -1,8 +1,7 @@
-// moves.js
-const pawnMoves = (position, rank, file, piece) => {
+export const pawnMoves = (position, rank, file, piece) => {
   const moves = [];
   const opp = piece.startsWith("w") ? "b" : "w";
-  const direction = piece.startsWith("w") ? -1 : 1; // White pawns move up (-1), Black down (+1)
+  const direction = piece.startsWith("w") ? -1 : 1;
   const startingRank = piece.startsWith("w") ? 6 : 1;
 
   // Move forward one square
@@ -31,4 +30,33 @@ const pawnMoves = (position, rank, file, piece) => {
   return moves;
 };
 
-export default pawnMoves;
+export const knightMoves = (position, rank, file, piece) => {
+  const moves = [];
+  const opp = piece.startsWith("w") ? "b" : "w";
+  const offsets = [
+    [-2, -1],
+    [-2, 1],
+    [-1, -2],
+    [-1, 2],
+    [1, -2],
+    [1, 2],
+    [2, -1],
+    [2, 1],
+  ];
+
+  for (const [dr, df] of offsets) {
+    const newRank = rank + dr;
+    const newFile = file + df;
+
+    if (newRank >= 0 && newRank < 8 && newFile >= 0 && newFile < 8) {
+      if (
+        position[newRank][newFile] === "" ||
+        position[newRank][newFile].startsWith(opp)
+      ) {
+        moves.push([newRank, newFile]);
+      }
+    }
+  }
+
+  return moves;
+};

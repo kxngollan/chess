@@ -20,7 +20,7 @@ import Tile from "@/components/Tile.vue";
 import Piece from "@/components/Piece.vue";
 import Files from "@/components/Files.vue";
 import Ranks from "@/components/Ranks.vue";
-import pawnMoves from "@/moves.js";
+import { pawnMoves, knightMoves } from "@/moves.js";
 
 export default {
   components: { Tile, Piece, Files, Ranks },
@@ -55,11 +55,18 @@ export default {
     },
     getMoves(board, rank, file, piece) {
       console.log(`File: ${file}, Rank: ${rank}, Piece: ${piece}`);
+
       if (piece.endsWith("p")) {
         const moves = pawnMoves(board, rank, file, piece);
         console.log("Possible moves:", moves);
       }
+      if (piece.endsWith("n")) {
+        const moves = knightMoves(board, rank, file, piece)
+        console.log(moves)
+      }
     }
+
+
   },
   mounted() {
     this.createBoard();
