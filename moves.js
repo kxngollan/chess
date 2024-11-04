@@ -133,3 +133,34 @@ export const queenMoves = (position, rank, file, piece) => {
 
   return moves;
 };
+
+export const kingMoves = (position, rank, file, piece) => {
+  const moves = [];
+  const opp = piece.startsWith("w") ? "b" : "w";
+  const directions = [
+    [-1, -1],
+    [-1, 0],
+    [-1, 1],
+    [0, -1],
+    [0, 1],
+    [1, -1],
+    [1, 0],
+    [1, 1],
+  ];
+
+  for (const [dr, df] of directions) {
+    const newRank = rank + dr;
+    const newFile = file + df;
+
+    if (newRank >= 0 && newRank < 8 && newFile >= 0 && newFile < 8) {
+      if (
+        position[newRank][newFile] === "" ||
+        position[newRank][newFile].startsWith(opp)
+      ) {
+        moves.push([newRank, newFile]);
+      }
+    }
+  }
+
+  return moves;
+};
