@@ -20,7 +20,7 @@ import Tile from "@/components/Tile.vue";
 import Piece from "@/components/Piece.vue";
 import Files from "@/components/Files.vue";
 import Ranks from "@/components/Ranks.vue";
-import { pawnMoves, knightMoves, bishopMoves, rookMoves } from "@/moves.js";
+import { pawnMoves, knightMoves, bishopMoves, rookMoves, queenMoves } from "@/moves.js";
 
 export default {
   components: { Tile, Piece, Files, Ranks },
@@ -52,6 +52,7 @@ export default {
       // Place other pieces
       this.board[0] = ["br", "bn", "bb", "bq", "bk", "bb", "bn", "br"];
       this.board[7] = ["wr", "wn", "wb", "wq", "wk", "wb", "wn", "wr"];
+      this.board[3][6] = "wq"
     },
     getMoves(board, rank, file, piece) {
       console.log(`File: ${file}, Rank: ${rank}, Piece: ${piece}`);
@@ -70,6 +71,10 @@ export default {
       }
       if (piece.endsWith("r")) {
         const moves = rookMoves(board, rank, file, piece)
+        console.log(moves)
+      }
+      if (piece.endsWith("q")) {
+        const moves = queenMoves(board, rank, file, piece)
         console.log(moves)
       }
     }
