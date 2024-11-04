@@ -20,7 +20,7 @@ import Tile from "@/components/Tile.vue";
 import Piece from "@/components/Piece.vue";
 import Files from "@/components/Files.vue";
 import Ranks from "@/components/Ranks.vue";
-import { pawnMoves, knightMoves } from "@/moves.js";
+import { pawnMoves, knightMoves, bishopMoves, rookMoves } from "@/moves.js";
 
 export default {
   components: { Tile, Piece, Files, Ranks },
@@ -62,6 +62,14 @@ export default {
       }
       if (piece.endsWith("n")) {
         const moves = knightMoves(board, rank, file, piece)
+        console.log(moves)
+      }
+      if (piece.endsWith("b")) {
+        const moves = bishopMoves(board, rank, file, piece)
+        console.log(moves)
+      }
+      if (piece.endsWith("r")) {
+        const moves = rookMoves(board, rank, file, piece)
         console.log(moves)
       }
     }

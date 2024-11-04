@@ -60,3 +60,67 @@ export const knightMoves = (position, rank, file, piece) => {
 
   return moves;
 };
+
+export const bishopMoves = (position, rank, file, piece) => {
+  const moves = [];
+  const opp = piece.startsWith("w") ? "b" : "w";
+  const directions = [
+    [-1, -1],
+    [-1, 1],
+    [1, -1],
+    [1, 1],
+  ];
+
+  for (const [dr, df] of directions) {
+    let newRank = rank + dr;
+    let newFile = file + df;
+
+    while (newRank >= 0 && newRank < 8 && newFile >= 0 && newFile < 8) {
+      if (position[newRank][newFile] === "") {
+        moves.push([newRank, newFile]);
+      } else if (position[newRank][newFile].startsWith(opp)) {
+        moves.push([newRank, newFile]);
+        break;
+      } else {
+        break;
+      }
+
+      newRank += dr;
+      newFile += df;
+    }
+  }
+
+  return moves;
+};
+
+export const rookMoves = (position, rank, file, piece) => {
+  const moves = [];
+  const opp = piece.startsWith("w") ? "b" : "w";
+  const directions = [
+    [-1, 0],
+    [1, 0],
+    [0, -1],
+    [0, 1],
+  ];
+
+  for (const [dr, df] of directions) {
+    let newRank = rank + dr;
+    let newFile = file + df;
+
+    while (newRank >= 0 && newRank < 8 && newFile >= 0 && newFile < 8) {
+      if (position[newRank][newFile] === "") {
+        moves.push([newRank, newFile]);
+      } else if (position[newRank][newFile].startsWith(opp)) {
+        moves.push([newRank, newFile]);
+        break;
+      } else {
+        break;
+      }
+
+      newRank += dr;
+      newFile += df;
+    }
+  }
+
+  return moves;
+};
