@@ -9,7 +9,6 @@ export default {
     computed: {
         pieceImage() {
             const path = `/img/${this.piece}.png`
-            console.log('Image path:', path);
             return path;
         }
     }

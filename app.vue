@@ -1,29 +1,40 @@
 <template>
   <main>
-    <div class="board">
-      <div class="row" v-for="(row, rowIndex) in board" :key="rowIndex">
-        <Tile v-for="(tile, tileIndex) in row" :key="tileIndex"
-          :color="(rowIndex + tileIndex) % 2 === 0 ? 'white' : 'black'" :class="tile ? 'occupied' : ''">
-          <Piece v-if="tile" :piece="tile" />
-        </Tile>
+    <div class="play">
+      <Ranks class="rank" :ranks="ranks" />
+      <div class="board">
+        <div class="row" v-for="(row, rankIndex) in board" :key="rankIndex">
+          <Tile v-for="(tile, fileIndex) in row" :key="fileIndex"
+            :color="(rankIndex + fileIndex) % 2 === 0 ? 'white' : 'black'" :class="tile ? 'occupied' : ''">
+            <Piece v-if="tile" :piece="tile" @click="getMoves(board, rankIndex, fileIndex, tile)" />
+          </Tile>
+        </div>
       </div>
+      <Files class="file" :files="files" />
     </div>
   </main>
 </template>
 
 <script>
 import Tile from "@/components/Tile.vue";
-import Piece from "@/components/Piece.vue"
+import Piece from "@/components/Piece.vue";
+import Files from "@/components/Files.vue";
+import Ranks from "@/components/Ranks.vue";
+import pawnMoves from "@/moves.js";
 
 export default {
-  components: { Tile, Piece },
+  components: { Tile, Piece, Files, Ranks },
   data() {
     return {
       board: [],
+      ranks: [8, 7, 6, 5, 4, 3, 2, 1],
+      files: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
+      turn: "w"
     };
   },
   methods: {
     createBoard() {
+
       for (let i = 0; i < 8; i++) {
         let row = [];
         for (let j = 0; j < 8; j++) {
@@ -37,17 +48,31 @@ export default {
         }
         this.board.push(row);
       }
+
+      // Place other pieces
       this.board[0] = ["br", "bn", "bb", "bq", "bk", "bb", "bn", "br"];
       this.board[7] = ["wr", "wn", "wb", "wq", "wk", "wb", "wn", "wr"];
+    },
+    getMoves(board, rank, file, piece) {
+      console.log(`File: ${file}, Rank: ${rank}, Piece: ${piece}`);
+      if (piece.endsWith("p")) {
+        const moves = pawnMoves(board, rank, file, piece);
+        console.log("Possible moves:", moves);
+      }
     }
   },
   mounted() {
     this.createBoard();
-  },
+  }
 };
 </script>
 
 <style>
+body {
+  margin: 0;
+  padding: 0;
+}
+
 main {
   width: 100vw;
   height: 100vh;
@@ -56,11 +81,25 @@ main {
   align-items: center;
 }
 
+.play {
+  position: relative;
+}
+
 .board {
   width: 720px;
   aspect-ratio: 1 / 1;
   display: flex;
   flex-direction: column;
+}
+
+.file {
+  position: absolute;
+  bottom: -20px;
+}
+
+.rank {
+  position: absolute;
+  left: -20px;
 }
 
 .row {
