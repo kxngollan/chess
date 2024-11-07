@@ -17,7 +17,7 @@ export default {
 </script>
 
 <style scoped>
-img:active {
-    cursor: grab;
+img:hover {
+    cursor: pointer;
 }
 </style>

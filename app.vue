@@ -5,8 +5,9 @@
       <div class="board">
         <div class="row" v-for="(row, rankIndex) in board" :key="rankIndex">
           <Tile v-for="(tile, fileIndex) in row" :key="fileIndex"
-            :color="(rankIndex + fileIndex) % 2 === 0 ? 'white' : 'black'"
-            :possibleMove="moves.some(move => move[0] === rankIndex && move[1] === fileIndex) ? true : false">
+            :color="(rankIndex + fileIndex) % 2 === 0 ? 'white' : 'black'" @clearMoves="clear" :tile="tile"
+            :possibleMove="moves.some(move => move[0] === rankIndex && move[1] === fileIndex) ? true : false"
+            @makeMove="makeMove">
             <Piece v-if="tile" :piece="tile" @click="getMoves(board, rankIndex, fileIndex, tile)" />
           </Tile>
         </div>
@@ -21,7 +22,7 @@ import Tile from "@/components/Tile.vue";
 import Piece from "@/components/Piece.vue";
 import Files from "@/components/Files.vue";
 import Ranks from "@/components/Ranks.vue";
-import { pawnMoves, knightMoves, bishopMoves, rookMoves, queenMoves, kingMoves } from "@/moves.js";
+import { getMoves } from "./getMove";
 
 export default {
   components: { Tile, Piece, Files, Ranks },
@@ -31,12 +32,11 @@ export default {
       ranks: [8, 7, 6, 5, 4, 3, 2, 1],
       files: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
       turn: "w",
-      moves: []  // Moves array to store possible moves
+      moves: []
     };
   },
   methods: {
     createBoard() {
-      // Create board with pieces
       for (let i = 0; i < 8; i++) {
         let row = [];
         for (let j = 0; j < 8; j++) {
@@ -54,32 +54,17 @@ export default {
       this.board[7] = ["wr", "wn", "wb", "wq", "wk", "wb", "wn", "wr"];
     },
     getMoves(board, rank, file, piece) {
-      console.log(`File: ${file}, Rank: ${rank}, Piece: ${piece}`);
-      if (piece.endsWith("p")) {
-        this.moves = pawnMoves(board, rank, file, piece);
-      }
-      if (piece.endsWith("n")) {
-        this.moves = knightMoves(board, rank, file, piece);
-      }
-      if (piece.endsWith("b")) {
-        this.moves = bishopMoves(board, rank, file, piece);
-      }
-      if (piece.endsWith("r")) {
-        this.moves = rookMoves(board, rank, file, piece);
-      }
-      if (piece.endsWith("q")) {
-        this.moves = queenMoves(board, rank, file, piece);
-      }
-      if (piece.endsWith("k")) {
-        this.moves = kingMoves(board, rank, file, piece);
-      }
+      this.moves = getMoves(board, rank, file, piece);
+
+    },
+    makeMove() {
+      console.log("Making Move")
+    },
+    clear() {
+      this.moves = []
     }
   },
   watch: {
-
-    moves(newMoves) {
-      console.log("Updated moves:", newMoves);
-    }
   },
   mounted() {
     this.createBoard();
