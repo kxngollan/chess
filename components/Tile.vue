@@ -7,7 +7,7 @@
 
 <script>
 export default {
-    props: ["color", "tile", "possibleMove"],
+    props: ["color", "tile", "possibleMove", "file", "rank"],
     methods: {
         clear() {
             if (!this.possibleMove && !this.tile) {

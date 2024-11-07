@@ -6,6 +6,7 @@
         <div class="row" v-for="(row, rankIndex) in board" :key="rankIndex">
           <Tile v-for="(tile, fileIndex) in row" :key="fileIndex"
             :color="(rankIndex + fileIndex) % 2 === 0 ? 'white' : 'black'" @clearMoves="clear" :tile="tile"
+            :file="fileIndex" :rank="rankIndex"
             :possibleMove="moves.some(move => move[0] === rankIndex && move[1] === fileIndex) ? true : false"
             @makeMove="makeMove">
             <Piece v-if="tile" :piece="tile" @click="getMoves(board, rankIndex, fileIndex, tile)" />
@@ -32,7 +33,8 @@ export default {
       ranks: [8, 7, 6, 5, 4, 3, 2, 1],
       files: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
       turn: "w",
-      moves: []
+      moves: [],
+      positions: []
     };
   },
   methods: {
@@ -50,16 +52,17 @@ export default {
         }
         this.board.push(row);
       }
-      this.board[0] = ["wr", "bn", "bb", "bq", "bk", "bb", "bn", "br"];
+      this.board[0] = ["br", "bn", "bb", "bq", "bk", "bb", "bn", "br"];
       this.board[7] = ["wr", "wn", "wb", "wq", "wk", "wb", "wn", "wr"];
+      this.positions.push(this.board)
     },
     getMoves(board, rank, file, piece) {
-      this.moves = getMoves(board, rank, file, piece);
-
+      if (piece.startsWith(this.turn)) this.moves = getMoves(board, rank, file, piece);
     },
     makeMove() {
-      console.log("Making Move")
+
     },
+
     clear() {
       this.moves = []
     }
