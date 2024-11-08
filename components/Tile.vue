@@ -1,6 +1,6 @@
 <template>
     <div :class="['tile', color]" @click="clear">
-        <span v-if="possibleMove" :class="[tile ? 'capture' : 'highlight']" @click="makeMove"></span>
+        <span v-if="possibleMove" :class="[tile ? 'capture' : 'highlight']" @click.stop="makeMove"></span>
         <slot></slot>
     </div>
 </template>

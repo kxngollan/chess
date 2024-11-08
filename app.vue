@@ -7,14 +7,14 @@
           <Tile v-for="(tile, fileIndex) in row" :key="fileIndex"
             :color="(rankIndex + fileIndex) % 2 === 0 ? 'white' : 'black'" @clearMoves="clear" :tile="tile"
             :file="fileIndex" :rank="rankIndex"
-            :possibleMove="moves.some(move => move[0] === rankIndex && move[1] === fileIndex) ? true : false"
-            @makeMove="makeMove">
+            :possibleMove="moves.some(move => move[0] === rankIndex && move[1] === fileIndex)" @makeMove="makeMove">
             <Piece v-if="tile" :piece="tile" @click="getMoves(board, rankIndex, fileIndex, tile)" />
           </Tile>
         </div>
       </div>
       <Files class="file" :files="files" />
     </div>
+    <button @click="takeBack">Take back</button>
   </main>
 </template>
 
@@ -24,6 +24,7 @@ import Piece from "@/components/Piece.vue";
 import Files from "@/components/Files.vue";
 import Ranks from "@/components/Ranks.vue";
 import { getMoves } from "./getMove";
+import makeMove from "./makeMove";
 
 export default {
   components: { Tile, Piece, Files, Ranks },
@@ -42,53 +43,52 @@ export default {
   },
   methods: {
     createBoard() {
-      for (let i = 0; i < 8; i++) {
-        let row = [];
-        for (let j = 0; j < 8; j++) {
-          if (i === 1) {
-            row.push("bp");
-          } else if (i === 6) {
-            row.push("wp");
-          } else {
-            row.push("");
-          }
-        }
-        this.board.push(row);
-      }
-      this.board[0] = ["br", "bn", "bb", "bq", "bk", "bb", "bn", "br"];
-      this.board[7] = ["wr", "wn", "wb", "wq", "wk", "wb", "wn", "wr"];
-      this.positions = [this.board]
-      console.log(this.positions)
+      this.board = [
+        ["br", "bn", "bb", "bq", "bk", "bb", "bn", "br"],
+        Array(8).fill("bp"),
+        Array(8).fill(""),
+        Array(8).fill(""),
+        Array(8).fill(""),
+        Array(8).fill(""),
+        Array(8).fill("wp"),
+        ["wr", "wn", "wb", "wq", "wk", "wb", "wn", "wr"],
+      ];
+      this.positions = [{ turn: 0, position: this.board }];
     },
-    getMoves(board, rank, file, piece, positions) {
+    getMoves(board, rank, file, piece) {
       if (piece.startsWith(this.turn)) {
-        this.moves = getMoves(board, rank, file, piece, positions);
+        this.moves = getMoves(board, rank, file, piece, this.positions);
         this.piece = piece;
         this.rank = rank;
         this.file = file;
-        this.positions = positions;
       }
     },
     makeMove(file, rank) {
+      if (!this.piece || this.file === null || this.rank === null) return;
+
       if (this.moves.length > 0) {
-        this.board[this.rank][this.file] = "";
-        this.board[rank][file] = this.piece;
-        // Alternate turn
-        if (this.turn === "w") {
-          this.turn = "b"
-        } else {
-          this.turn = "w"
-        }
+        const moveData = makeMove(this.piece, this.file, this.rank, file, rank, this.positions, this.board);
+
+        this.board = moveData.board;
+        this.positions = moveData.positions;
+
+        this.turn = this.turn === "w" ? "b" : "w";
       }
       this.clear();
-      this.positions.push(this.board)
-      console.log(this.positions)
     },
     clear() {
-      this.moves = []
-      this.piece = null
-      this.file = null
-      this.rank = null
+      this.moves = [];
+      this.piece = null;
+      this.file = null;
+      this.rank = null;
+    },
+    takeBack() {
+      if (this.positions.length > 1) {
+        this.positions.pop();
+        const lastPosition = this.positions[this.positions.length - 1];
+        this.board = lastPosition.position;
+        this.turn = lastPosition.turn % 2 === 0 ? "w" : "b";
+      }
     }
   },
   mounted() {
@@ -96,7 +96,6 @@ export default {
   }
 };
 </script>
-
 
 <style>
 body {
