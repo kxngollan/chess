@@ -4,6 +4,7 @@ import {
   kingMoves,
   rookMoves,
   queenMoves,
+  bishopMoves,
 } from "@/moves";
 
 export const getMoves = (board, rank, file, piece) => {
