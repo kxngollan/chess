@@ -34,7 +34,10 @@ export default {
       files: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
       turn: "w",
       moves: [],
-      positions: []
+      positions: [],
+      piece: null,
+      rank: null,
+      file: null,
     };
   },
   methods: {
@@ -54,20 +57,39 @@ export default {
       }
       this.board[0] = ["br", "bn", "bb", "bq", "bk", "bb", "bn", "br"];
       this.board[7] = ["wr", "wn", "wb", "wq", "wk", "wb", "wn", "wr"];
+      this.positions = [this.board]
+      console.log(this.positions)
+    },
+    getMoves(board, rank, file, piece, positions) {
+      if (piece.startsWith(this.turn)) {
+        this.moves = getMoves(board, rank, file, piece, positions);
+        this.piece = piece;
+        this.rank = rank;
+        this.file = file;
+        this.positions = positions;
+      }
+    },
+    makeMove(file, rank) {
+      if (this.moves.length > 0) {
+        this.board[this.rank][this.file] = "";
+        this.board[rank][file] = this.piece;
+        // Alternate turn
+        if (this.turn === "w") {
+          this.turn = "b"
+        } else {
+          this.turn = "w"
+        }
+      }
+      this.clear();
       this.positions.push(this.board)
+      console.log(this.positions)
     },
-    getMoves(board, rank, file, piece) {
-      if (piece.startsWith(this.turn)) this.moves = getMoves(board, rank, file, piece);
-    },
-    makeMove() {
-
-    },
-
     clear() {
       this.moves = []
+      this.piece = null
+      this.file = null
+      this.rank = null
     }
-  },
-  watch: {
   },
   mounted() {
     this.createBoard();

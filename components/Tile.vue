@@ -15,7 +15,7 @@ export default {
             }
         },
         makeMove() {
-            this.$emit("makeMove")
+            this.$emit("makeMove", this.file, this.rank)
         }
     }
 
