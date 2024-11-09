@@ -1,8 +1,9 @@
-export const pawnMoves = (position, rank, file, piece) => {
+export const pawnMoves = (position, rank, file, piece, prevPosition) => {
   const moves = [];
   const opp = piece.startsWith("w") ? "b" : "w";
   const direction = piece.startsWith("w") ? -1 : 1;
   const startingRank = piece.startsWith("w") ? 6 : 1;
+  const oppStartingRank = piece.startsWith("w") ? 1 : 6;
 
   // Move forward one square
   if (position[rank + direction]?.[file] === "") {
@@ -27,6 +28,43 @@ export const pawnMoves = (position, rank, file, piece) => {
     moves.push([rank + direction, file + 1]);
   }
 
+  //En passant
+
+  if (
+    file < 7 &&
+    prevPosition[prevPosition.length - 1]?.["position"]?.[rank]?.[file + 1] ===
+      opp + "p" &&
+    prevPosition[prevPosition.length - 1]?.["position"]?.[oppStartingRank]?.[
+      file + 1
+    ] === "" &&
+    file < 7 &&
+    prevPosition[prevPosition.length - 2]?.["position"]?.[rank]?.[file + 1] ===
+      "" &&
+    prevPosition[prevPosition.length - 2]?.["position"]?.[oppStartingRank]?.[
+      file + 1
+    ] ===
+      opp + "p"
+  ) {
+    moves.push([rank + direction, file + 1]);
+  }
+
+  if (
+    file > 0 &&
+    prevPosition[prevPosition.length - 1]?.["position"]?.[rank]?.[file - 1] ===
+      opp + "p" &&
+    prevPosition[prevPosition.length - 1]?.["position"]?.[oppStartingRank]?.[
+      file - 1
+    ] === "" &&
+    file < 7 &&
+    prevPosition[prevPosition.length - 2]?.["position"]?.[rank]?.[file - 1] ===
+      "" &&
+    prevPosition[prevPosition.length - 2]?.["position"]?.[oppStartingRank]?.[
+      file - 1
+    ] ===
+      opp + "p"
+  ) {
+    moves.push([rank + direction, file - 1]);
+  }
   return moves;
 };
 

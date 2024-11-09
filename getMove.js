@@ -7,9 +7,9 @@ import {
   bishopMoves,
 } from "@/moves";
 
-export const getMoves = (board, rank, file, piece) => {
+export const getMoves = (board, rank, file, piece, positions) => {
   if (piece.endsWith("p")) {
-    return pawnMoves(board, rank, file, piece);
+    return pawnMoves(board, rank, file, piece, positions);
   }
   if (piece.endsWith("n")) {
     return knightMoves(board, rank, file, piece);

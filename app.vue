@@ -89,6 +89,7 @@ export default {
         this.board = lastPosition.position;
         this.turn = lastPosition.turn % 2 === 0 ? "w" : "b";
       }
+      this.clear();
     }
   },
   mounted() {
