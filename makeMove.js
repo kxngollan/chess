@@ -33,6 +33,20 @@ const makeMove = (
     }
   }
 
+  if (
+    piece.endsWith("k") &&
+    Math.abs(newFile - oldFile) == 2 &&
+    oldRank === newRank
+  ) {
+    if (newFile - oldFile > 0) {
+      newBoard[oldRank][oldFile + 1] = piece.startsWith("w") ? "wr" : "br";
+      newBoard[oldRank][oldFile + 3] = "";
+    } else {
+      newBoard[oldRank][oldFile - 1] = piece.startsWith("w") ? "wr" : "br";
+      newBoard[oldRank][oldFile - 4] = "";
+    }
+  }
+
   newBoard[oldRank][oldFile] = "";
   newBoard[newRank][newFile] = piece;
 
