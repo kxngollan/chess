@@ -24,6 +24,6 @@ export const getMoves = (board, rank, file, piece, positions) => {
     return queenMoves(board, rank, file, piece);
   }
   if (piece.endsWith("k")) {
-    return kingMoves(board, rank, file, piece);
+    return kingMoves(board, rank, file, piece, positions);
   }
 };

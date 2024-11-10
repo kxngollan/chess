@@ -171,8 +171,7 @@ export const queenMoves = (position, rank, file, piece) => {
 
   return moves;
 };
-
-export const kingMoves = (position, rank, file, piece) => {
+export const kingMoves = (position, rank, file, piece, prevPosition) => {
   const moves = [];
   const opp = piece.startsWith("w") ? "b" : "w";
   const directions = [
@@ -186,6 +185,7 @@ export const kingMoves = (position, rank, file, piece) => {
     [1, 1],
   ];
 
+  // Normal king moves
   for (const [dr, df] of directions) {
     const newRank = rank + dr;
     const newFile = file + df;
@@ -198,6 +198,53 @@ export const kingMoves = (position, rank, file, piece) => {
         moves.push([newRank, newFile]);
       }
     }
+  }
+
+  // Castling moves
+  if (rank === 0 || rank === 7) {
+    console.log("right rank");
+    const castlingMoves = castling(position, rank, file, piece, prevPosition);
+    moves.push(...castlingMoves);
+  }
+
+  return moves;
+};
+
+const castling = (position, rank, file, piece, prevPosition) => {
+  const moves = [];
+
+  // Check if the king has not moved from its starting position
+  let kingHasNotMoved = true;
+
+  for (let i = 0; i < prevPosition.length; i++) {
+    if (prevPosition[i]["position"][rank][file] !== piece) {
+      kingHasNotMoved = false;
+      break;
+    }
+  }
+  console.log("king has not moved: ", kingHasNotMoved);
+  if (!kingHasNotMoved) return moves;
+
+  // Check if the king is white or black
+  const rook = piece.startsWith("w") ? "wr" : "br";
+
+  // Kingside castling
+  if (
+    position[rank][file + 1] === "" &&
+    position[rank][file + 2] === "" &&
+    position[rank][file + 3] === rook
+  ) {
+    moves.push([rank, file + 2]);
+  }
+
+  // Queenside castling
+  if (
+    position[rank][file - 1] === "" &&
+    position[rank][file - 2] === "" &&
+    position[rank][file - 3] === "" &&
+    position[rank][file - 4] === rook
+  ) {
+    moves.push([rank, file - 2]);
   }
 
   return moves;

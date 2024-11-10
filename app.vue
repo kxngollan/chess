@@ -51,7 +51,7 @@ export default {
         Array(8).fill(""),
         Array(8).fill(""),
         Array(8).fill("wp"),
-        ["wr", "wn", "wb", "wq", "wk", "wb", "wn", "wr"],
+        ["wr", "wn", "wb", "wq", "wk", "", "", "wr"],
       ];
       this.positions = [{ turn: 0, position: this.board }];
     },
