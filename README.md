@@ -1,6 +1,6 @@
 ## Description:
 
-This is a real time chess game that I have created using NuxtJs which is built on top of the vue framework.
+This is a real time chess game that I have created using NuxtJs which is a Vue.js framework for seamless development and SSR (Server-Side Rendering).
 
 ## Features:
 
