@@ -23,8 +23,9 @@ import Tile from "@/components/Tile.vue";
 import Piece from "@/components/Piece.vue";
 import Files from "@/components/Files.vue";
 import Ranks from "@/components/Ranks.vue";
-import { getMoves } from "./getMove";
+import getMoves from "./getMove";
 import makeMove from "./makeMove";
+import inCheck from "./inCheck";
 
 export default {
   components: { Tile, Piece, Files, Ranks },
@@ -56,8 +57,18 @@ export default {
       this.positions = [{ turn: 0, position: this.board }];
     },
     getMoves(board, rank, file, piece) {
+      console.log("clicked")
       if (piece.startsWith(this.turn)) {
-        this.moves = getMoves(board, rank, file, piece, this.positions);
+        let moves = getMoves(board, rank, file, piece, this.positions);
+        console.log("possible moves ", moves)
+
+        let possibleMove = []
+
+        for (let i = 0; i < moves.length; i++) {
+          if (!inCheck(moves[i], board, rank, file, piece, this.positions)) { possibleMove.push(moves[i]) }
+        }
+
+        this.moves = possibleMove
         this.piece = piece;
         this.rank = rank;
         this.file = file;
@@ -121,6 +132,8 @@ main {
   aspect-ratio: 1 / 1;
   display: flex;
   flex-direction: column;
+  border-radius: 16px;
+  overflow: hidden;
 }
 
 .file {

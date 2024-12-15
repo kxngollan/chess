@@ -7,7 +7,7 @@ import {
   bishopMoves,
 } from "@/moves";
 
-export const getMoves = (board, rank, file, piece, positions) => {
+const getMoves = (board, rank, file, piece, positions) => {
   if (piece.endsWith("p")) {
     return pawnMoves(board, rank, file, piece, positions);
   }
@@ -27,3 +27,5 @@ export const getMoves = (board, rank, file, piece, positions) => {
     return kingMoves(board, rank, file, piece, positions);
   }
 };
+
+export default getMoves;
