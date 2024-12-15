@@ -1,3 +1,5 @@
+import getMoves from "./getMove";
+
 export const pawnMoves = (position, rank, file, piece, prevPosition) => {
   const moves = [];
   const opp = piece.startsWith("w") ? "b" : "w";
@@ -165,6 +167,7 @@ export const queenMoves = (position, rank, file, piece) => {
 
   return moves;
 };
+
 export const kingMoves = (position, rank, file, piece, prevPosition) => {
   const moves = [];
   const opp = piece.startsWith("w") ? "b" : "w";
@@ -206,7 +209,10 @@ export const kingMoves = (position, rank, file, piece, prevPosition) => {
 const castling = (position, rank, file, piece, prevPosition) => {
   const moves = [];
 
-  // Check if the king has not moved from its starting position
+  if (kingInCheck(position, rank, file, piece)) {
+    return moves;
+  }
+
   let kingHasNotMoved = true;
 
   for (let i = 0; i < prevPosition.length; i++) {
@@ -217,27 +223,48 @@ const castling = (position, rank, file, piece, prevPosition) => {
   }
   if (!kingHasNotMoved) return moves;
 
-  // Check if the king is white or black
   const rook = piece.startsWith("w") ? "wr" : "br";
 
-  // Kingside castling
   if (
     position[rank][file + 1] === "" &&
     position[rank][file + 2] === "" &&
-    position[rank][file + 3] === rook
+    position[rank][file + 3] === rook &&
+    !kingInCheck(position, rank, file + 1, piece) &&
+    !kingInCheck(position, rank, file + 2, piece)
   ) {
     moves.push([rank, file + 2]);
   }
 
-  // Queenside castling
   if (
     position[rank][file - 1] === "" &&
     position[rank][file - 2] === "" &&
     position[rank][file - 3] === "" &&
-    position[rank][file - 4] === rook
+    position[rank][file - 4] === rook &&
+    !kingInCheck(position, rank, file - 1, piece) &&
+    !kingInCheck(position, rank, file - 2, piece)
   ) {
     moves.push([rank, file - 2]);
   }
 
   return moves;
+};
+
+const kingInCheck = (position, rank, file, piece) => {
+  const opp = piece.startsWith("w") ? "b" : "w";
+  const oppKing = opp + "k";
+
+  for (let i = 0; i < 8; i++) {
+    for (let j = 0; j < 8; j++) {
+      if (position[i][j].startsWith(opp) && position[i][j] !== oppKing) {
+        const moves = getMoves(position, i, j, position[i][j], []);
+
+        for (let [moveRank, moveFile] of moves) {
+          if (moveRank === rank && moveFile === file) {
+            return true;
+          }
+        }
+      }
+    }
+  }
+  return false;
 };

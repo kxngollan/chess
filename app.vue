@@ -57,10 +57,8 @@ export default {
       this.positions = [{ turn: 0, position: this.board }];
     },
     getMoves(board, rank, file, piece) {
-      console.log("clicked")
       if (piece.startsWith(this.turn)) {
         let moves = getMoves(board, rank, file, piece, this.positions);
-        console.log("possible moves ", moves)
 
         let possibleMove = []
 
