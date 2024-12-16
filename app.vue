@@ -15,6 +15,7 @@
       <Files class="file" :files="files" />
     </div>
     <button @click="takeBack">Take back</button>
+    <button @click="newGame">New Game</button>
   </main>
 </template>
 
@@ -56,6 +57,13 @@ export default {
       ];
       this.positions = [{ turn: 0, position: this.board }];
     },
+    newGame() {
+      this.turn = "w"
+      this.positions = []
+      this.createBoard()
+      this.clear()
+    }
+    ,
     getMoves(board, rank, file, piece) {
       if (piece.startsWith(this.turn)) {
         let moves = getMoves(board, rank, file, piece, this.positions);

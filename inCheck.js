@@ -12,7 +12,6 @@ const inCheck = (move, board, rank, file, piece, positions) => {
   for (let i = 0; i < 8; i++) {
     for (let j = 0; j < 8; j++) {
       if (newBoard[i][j].startsWith(opp)) {
-        // Get the possible moves for the opponent's piece at (i, j)
         const moves = getMoves(newBoard, i, j, newBoard[i][j], positions);
 
         for (let k = 0; k < moves.length; k++) {
