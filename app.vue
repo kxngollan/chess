@@ -16,6 +16,7 @@
     </div>
     <button @click="takeBack">Take back</button>
     <button @click="newGame">New Game</button>
+    <div v-if="checkmate">Game over</div>
   </main>
 </template>
 
@@ -27,6 +28,7 @@ import Ranks from "@/components/Ranks.vue";
 import getMoves from "./getMove";
 import makeMove from "./makeMove";
 import inCheck from "./inCheck";
+import isMate from "./isMate";
 
 export default {
   components: { Tile, Piece, Files, Ranks },
@@ -41,6 +43,7 @@ export default {
       piece: null,
       rank: null,
       file: null,
+      checkmate: false
     };
   },
   methods: {
@@ -74,6 +77,7 @@ export default {
           if (!inCheck(moves[i], board, rank, file, piece, this.positions)) { possibleMove.push(moves[i]) }
         }
 
+
         this.moves = possibleMove
         this.piece = piece;
         this.rank = rank;
@@ -88,6 +92,13 @@ export default {
 
         this.board = moveData.board;
         this.positions = moveData.positions;
+
+        console.log(isMate(this.turn, this.board))
+
+        if (isMate(this.turn, this.board)) {
+          console.log()
+          this.checkmate = true
+        }
 
         this.turn = this.turn === "w" ? "b" : "w";
       }
