@@ -3,6 +3,8 @@
     <div class="play">
       <Ranks class="rank" :ranks="ranks" />
       <div class="board">
+        <Promotion v-if="promotion" :player="turn" :file="promotionFile" :rank="promotionRank"
+          @makePromotion="makePromotion" />
         <div class="row" v-for="(row, rankIndex) in board" :key="rankIndex">
           <Tile v-for="(tile, fileIndex) in row" :key="fileIndex"
             :color="(rankIndex + fileIndex) % 2 === 0 ? 'white' : 'black'" @clearMoves="clear" :tile="tile"
@@ -29,9 +31,10 @@ import getMoves from "./getMove";
 import makeMove from "./makeMove";
 import inCheck from "./inCheck";
 import isMate from "./isMate";
+import Promotion from "./components/Promotion.vue";
 
 export default {
-  components: { Tile, Piece, Files, Ranks },
+  components: { Tile, Piece, Files, Ranks, Promotion },
   data() {
     return {
       board: [],
@@ -43,6 +46,9 @@ export default {
       piece: null,
       rank: null,
       file: null,
+      promotionFile: null,
+      promotionRank: null,
+      promotion: false,
       checkmate: false
     };
   },
@@ -63,6 +69,7 @@ export default {
     newGame() {
       this.turn = "w"
       this.positions = []
+      this.checkmate = false
       this.createBoard()
       this.clear()
     }
@@ -77,7 +84,6 @@ export default {
           if (!inCheck(moves[i], board, rank, file, piece, this.positions)) { possibleMove.push(moves[i]) }
         }
 
-
         this.moves = possibleMove
         this.piece = piece;
         this.rank = rank;
@@ -91,12 +97,19 @@ export default {
         const moveData = makeMove(this.piece, this.file, this.rank, file, rank, this.positions, this.board);
 
         this.board = moveData.board;
+
+        if (this.piece.endsWith("p")) {
+          if ((rank === 0 && this.piece.startsWith("w")) || (rank === 7 && this.piece.startsWith("b"))) {
+            console.log("promoting")
+            this.promotionFile = file
+            this.promotionRank = rank
+            return this.promotion = true
+          }
+        }
+
         this.positions = moveData.positions;
 
-        console.log(isMate(this.turn, this.board))
-
         if (isMate(this.turn, this.board)) {
-          console.log()
           this.checkmate = true
         }
 
@@ -104,11 +117,26 @@ export default {
       }
       this.clear();
     },
+    makePromotion(piece, file, rank) {
+      this.board[rank][file] = piece;
+      this.positions.push({ turn: this.turn, position: JSON.parse(JSON.stringify(this.board)) });
+
+      console.log(this.board)
+
+      if (isMate(this.turn, this.board)) {
+        this.checkmate = true
+      }
+
+      this.turn = this.turn === "w" ? "b" : "w";
+
+      this.clear()
+    },
     clear() {
       this.moves = [];
       this.piece = null;
       this.file = null;
       this.rank = null;
+      this.promotion = false;
     },
     takeBack() {
       if (this.positions.length > 1) {
@@ -118,6 +146,10 @@ export default {
         this.turn = lastPosition.turn % 2 === 0 ? "w" : "b";
       }
       this.clear();
+
+      if (this.checkmate === true) {
+        this.checkmate = false
+      }
     }
   },
   mounted() {
@@ -140,12 +172,11 @@ main {
   align-items: center;
 }
 
-.play {
-  position: relative;
-}
+.play {}
 
 .board {
   width: 720px;
+  position: relative;
   aspect-ratio: 1 / 1;
   display: flex;
   flex-direction: column;
