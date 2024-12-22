@@ -16,9 +16,11 @@ export default {
 <style scoped>
 .rank {
     height: 720px;
+    width: 16px;
     display: flex;
     flex-direction: column;
-    margin-right: 2px;
+    position: absolute;
+    right: -16;
 }
 
 span {
