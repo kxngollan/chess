@@ -24,7 +24,6 @@ export default {
     },
     methods: {
         makePromotions(piece) {
-            console.log(piece, this.file, this.rank);
             this.$emit("makePromotion", piece, this.file, this.rank);
         },
     },

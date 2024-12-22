@@ -23,15 +23,16 @@
 </template>
 
 <script>
+import Promotion from "@/components/Promotion.vue";
 import Tile from "@/components/Tile.vue";
 import Piece from "@/components/Piece.vue";
 import Files from "@/components/Files.vue";
 import Ranks from "@/components/Ranks.vue";
-import getMoves from "./getMove";
-import makeMove from "./makeMove";
-import inCheck from "./inCheck";
-import isMate from "./isMate";
-import Promotion from "./components/Promotion.vue";
+import getMoves from "@/lib/getMove";
+import makeMove from "@/lib/makeMove";
+import inCheck from "@/lib/inCheck";
+import isMate from "@/lib/isMate";
+import annotation from "@/lib/annotation";
 
 export default {
   components: { Tile, Piece, Files, Ranks, Promotion },
@@ -100,7 +101,7 @@ export default {
 
         if (this.piece.endsWith("p")) {
           if ((rank === 0 && this.piece.startsWith("w")) || (rank === 7 && this.piece.startsWith("b"))) {
-            console.log("promoting")
+
             this.promotionFile = file
             this.promotionRank = rank
             return this.promotion = true
@@ -115,13 +116,14 @@ export default {
 
         this.turn = this.turn === "w" ? "b" : "w";
       }
+
+      console.log(annotation(this.board, this.piece, file, rank, this.file, this.rank, this.positions[this.positions.length - 2]["position"]))
       this.clear();
     },
     makePromotion(piece, file, rank) {
       this.board[rank][file] = piece;
       this.positions.push({ turn: this.turn, position: JSON.parse(JSON.stringify(this.board)) });
 
-      console.log(this.board)
 
       if (isMate(this.turn, this.board)) {
         this.checkmate = true
@@ -154,6 +156,7 @@ export default {
   },
   mounted() {
     this.createBoard();
+    console.log(String.fromCharCode(91))
   }
 };
 </script>
@@ -172,7 +175,9 @@ main {
   align-items: center;
 }
 
-.play {}
+.play {
+  position: relative;
+}
 
 .board {
   width: 720px;

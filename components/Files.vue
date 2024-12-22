@@ -15,6 +15,9 @@ export default {
     display: flex;
     justify-content: space-between;
     width: 720px;
+    height: 16;
+    position: absolute;
+    bottom: -16;
 }
 
 span {
