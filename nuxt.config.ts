@@ -4,6 +4,7 @@ export default defineNuxtConfig({
   app: {
     head: {
       title: "Chess",
+      link: [{ rel: "icon", type: "image/x-icon", href: "/img/wp.png" }],
     },
   },
   devtools: { enabled: true },
