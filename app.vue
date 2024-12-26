@@ -8,13 +8,23 @@
         <div class="row" v-for="(row, rankIndex) in board" :key="rankIndex">
           <Tile v-for="(tile, fileIndex) in row" :key="fileIndex"
             :color="(rankIndex + fileIndex) % 2 === 0 ? 'white' : 'black'" @clearMoves="clear" :tile="tile"
-            :file="fileIndex" :rank="rankIndex"
-            :possibleMove="moves.some(move => move[0] === rankIndex && move[1] === fileIndex)" @makeMove="makeMove">
+            :file="fileIndex" :rank="rankIndex" :possibleMove="isPossibleMove(rankIndex, fileIndex)"
+            @makeMove="makeMove">
             <Piece v-if="tile" :piece="tile" @click="getMoves(board, rankIndex, fileIndex, tile)" />
           </Tile>
         </div>
       </div>
       <Files class="file" :files="files" />
+    </div>
+    <div class="notation">
+      <p v-if="positions.length > 0" v-for="(position, index) in positions" :key="index">
+        <span v-if="!(index === 0)">
+          {{ Math.ceil(position.turn / 2) }}.
+        </span>
+        <span v-if="!(index === 0)">
+          {{ position.notation }}
+        </span>
+      </p>
     </div>
     <button @click="takeBack">Take back</button>
     <button @click="newGame">New Game</button>
@@ -31,6 +41,7 @@ import Ranks from "@/components/Ranks.vue";
 import getMoves from "@/lib/getMove";
 import makeMove from "@/lib/makeMove";
 import inCheck from "@/lib/inCheck";
+import isCheck from "@/lib/isCheck";
 import isMate from "@/lib/isMate";
 import annotation from "@/lib/annotation";
 
@@ -44,13 +55,14 @@ export default {
       turn: "w",
       moves: [],
       positions: [],
+      notation: [],
       piece: null,
       rank: null,
       file: null,
       promotionFile: null,
       promotionRank: null,
       promotion: false,
-      checkmate: false
+      checkmate: false,
     };
   },
   methods: {
@@ -65,73 +77,83 @@ export default {
         Array(8).fill("wp"),
         ["wr", "wn", "wb", "wq", "wk", "wb", "wn", "wr"],
       ];
-      this.positions = [{ turn: 0, position: this.board }];
+      this.positions = [{ turn: 0, notation: "", position: this.board }];
     },
     newGame() {
-      this.turn = "w"
-      this.positions = []
-      this.checkmate = false
-      this.createBoard()
-      this.clear()
-    }
-    ,
+      this.turn = "w";
+      this.positions = [];
+      this.checkmate = false;
+      this.createBoard();
+      this.clear();
+    },
     getMoves(board, rank, file, piece) {
-      if (piece.startsWith(this.turn)) {
-        let moves = getMoves(board, rank, file, piece, this.positions);
-
-        let possibleMove = []
-
-        for (let i = 0; i < moves.length; i++) {
-          if (!inCheck(moves[i], board, rank, file, piece, this.positions)) { possibleMove.push(moves[i]) }
-        }
-
-        this.moves = possibleMove
-        this.piece = piece;
-        this.rank = rank;
-        this.file = file;
-      }
+      if (!piece.startsWith(this.turn)) return;
+      const allMoves = getMoves(board, rank, file, piece, this.positions);
+      this.moves = allMoves.filter((move) =>
+        !inCheck(move, board, rank, file, piece, this.positions)
+      );
+      this.piece = piece;
+      this.rank = rank;
+      this.file = file;
     },
     makeMove(file, rank) {
       if (!this.piece || this.file === null || this.rank === null) return;
+      if (!this.moves.some((move) => move[0] === rank && move[1] === file)) return;
 
-      if (this.moves.length > 0) {
-        const moveData = makeMove(this.piece, this.file, this.rank, file, rank, this.positions, this.board);
+      const moveData = makeMove(this.piece, this.file, this.rank, file, rank, this.positions, this.board);
+      this.board = moveData.board;
 
-        this.board = moveData.board;
+      let notation = annotation(
+        this.piece,
+        file,
+        rank,
+        this.file,
+        this.rank,
+        this.positions[this.positions.length - 1].position
+      );
+      let endNotation = "";
 
-        if (this.piece.endsWith("p")) {
-          if ((rank === 0 && this.piece.startsWith("w")) || (rank === 7 && this.piece.startsWith("b"))) {
+      this.positions.push(moveData.positions)
 
-            this.promotionFile = file
-            this.promotionRank = rank
-            return this.promotion = true
-          }
-        }
-
-        this.positions = moveData.positions;
-
-        if (isMate(this.turn, this.board)) {
-          this.checkmate = true
-        }
-
-        this.turn = this.turn === "w" ? "b" : "w";
+      if (this.piece.endsWith("p") && ((rank === 0 && this.turn === "w") || (rank === 7 && this.turn === "b"))) {
+        this.promotionFile = file;
+        this.promotionRank = rank;
+        this.positions[this.positions.length - 1].notation = notation;
+        this.promotion = true;
+        return;
       }
 
-      console.log(annotation(this.board, this.piece, file, rank, this.file, this.rank, this.positions[this.positions.length - 2]["position"]))
+      if (isCheck(this.board, this.turn)) endNotation = "+";
+      if (isMate(this.turn, this.board)) {
+        this.checkmate = true;
+        endNotation = "#";
+      }
+
+      this.positions[this.positions.length - 1].notation = notation + endNotation;
+
+
+      this.turn = this.turn === "w" ? "b" : "w";
+
+
       this.clear();
     },
     makePromotion(piece, file, rank) {
       this.board[rank][file] = piece;
-      this.positions.push({ turn: this.turn, position: JSON.parse(JSON.stringify(this.board)) });
+      const notation = "=" + piece[1].toUpperCase();
+      let endNotation = "";
+
 
 
       if (isMate(this.turn, this.board)) {
-        this.checkmate = true
+        this.checkmate = true;
+        endNotation = "#";
+      } else if (isCheck(this.board, this.turn)) {
+        endNotation = "+";
       }
 
+      this.positions[this.positions.length - 1].notation += notation + endNotation;
       this.turn = this.turn === "w" ? "b" : "w";
-
-      this.clear()
+      this.clear();
     },
     clear() {
       this.moves = [];
@@ -141,25 +163,28 @@ export default {
       this.promotion = false;
     },
     takeBack() {
-      if (this.positions.length > 1) {
-        this.positions.pop();
-        const lastPosition = this.positions[this.positions.length - 1];
-        this.board = lastPosition.position;
-        this.turn = lastPosition.turn % 2 === 0 ? "w" : "b";
-      }
+      if (this.positions.length === 1) { return; }
+      this.positions.pop();
+      const lastPosition = this.positions[this.positions.length - 1];
+      this.board = lastPosition.position;
+      this.turn = lastPosition.turn % 2 === 0 ? "w" : "b";
+      this.checkmate = false;
       this.clear();
+    },
+    isPossibleMove(rank, file) {
+      return this.moves.some((move) => move[0] === rank && move[1] === file);
+    },
+  },
+  computed() {
 
-      if (this.checkmate === true) {
-        this.checkmate = false
-      }
-    }
   },
   mounted() {
     this.createBoard();
-    console.log(String.fromCharCode(91))
-  }
+  },
 };
 </script>
+
+
 
 <style>
 body {
