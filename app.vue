@@ -21,8 +21,8 @@
       <Notation :positions="positions" />
       <div class="buttons">
         <button @click="takeBack">Take back</button>
-        <button @click="newGame">New Game</button>
         <button @click="resign">Resign</button>
+        <button @click="newGame">New Game</button>
       </div>
     </div>
   </main>
