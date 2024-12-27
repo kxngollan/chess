@@ -2,9 +2,10 @@
     <div class="module">
         <div class="overflow"></div>
         <div class="result">
-            <h2>Result:</h2>
-            <h1 v-if="positions.length % 2 === 0">White</h1>
-            <h1 v-else>Black</h1>
+            <h2>Result :</h2>
+            <br>
+            <h1 v-if="positions.length % 2 === 0">White Wins</h1>
+            <h1 v-else>Black Wins</h1>
         </div>
     </div>
 </template>
@@ -49,5 +50,9 @@ export default {
     background-color: rgba(255, 255, 255, 0.313);
     padding: 20px;
     z-index: 20;
+}
+
+h2 {
+    margin-right: 5px;
 }
 </style>
