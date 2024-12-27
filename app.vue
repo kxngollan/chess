@@ -18,7 +18,6 @@
       <Files class="file" :files="files" />
     </div>
     <div class="controls">
-
       <Notation :positions="positions" />
       <div class="buttons">
         <button @click="takeBack">Take back</button>
@@ -170,12 +169,12 @@ export default {
       this.promotion = false;
     },
     takeBack() {
+      this.checkmate = false;
       if (this.positions.length === 1) { return; }
       this.positions.pop();
       const lastPosition = this.positions[this.positions.length - 1];
       this.board = lastPosition.position;
       this.turn = lastPosition.turn % 2 === 0 ? "w" : "b";
-      this.checkmate = false;
       this.clear();
     },
     isPossibleMove(rank, file) {
@@ -237,5 +236,45 @@ main {
 .row {
   display: flex;
   flex: 1;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  height: 680px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-left: 10px;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.buttons button {
+  padding: 10px 20px;
+  font-size: 1em;
+  font-weight: bold;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.buttons button:hover {
+  background-color: #0056b3;
+}
+
+.buttons button:active {
+  background-color: #003d80;
 }
 </style>
