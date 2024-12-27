@@ -3,11 +3,12 @@
     <div class="play">
       <Ranks class="rank" :ranks="ranks" />
       <div class="board">
+        <Result v-if="checkmate" :positions="positions" />
         <Promotion v-if="promotion" :player="turn" :file="promotionFile" :rank="promotionRank"
           @makePromotion="makePromotion" />
         <div class="row" v-for="(row, rankIndex) in board" :key="rankIndex">
           <Tile v-for="(tile, fileIndex) in row" :key="fileIndex"
-            :color="(rankIndex + fileIndex) % 2 === 0 ? 'white' : 'black'" @clearMoves="clear" :tile="tile"
+            :color="((rankIndex + fileIndex) % 2 === 0) ? 'white' : 'black'" @clearMoves="clear" :tile="tile"
             :file="fileIndex" :rank="rankIndex" :possibleMove="isPossibleMove(rankIndex, fileIndex)"
             @makeMove="makeMove">
             <Piece v-if="tile" :piece="tile" @click="getMoves(board, rankIndex, fileIndex, tile)" />
@@ -16,28 +17,29 @@
       </div>
       <Files class="file" :files="files" />
     </div>
-    <div class="notation">
-      <p v-if="positions.length > 0" v-for="(position, index) in positions" :key="index">
-        <span v-if="!(index === 0)">
-          {{ Math.ceil(position.turn / 2) }}.
-        </span>
-        <span v-if="!(index === 0)">
-          {{ position.notation }}
-        </span>
-      </p>
+    <div class="controls">
+
+      <Notation :positions="positions" />
+      <div class="buttons">
+        <button @click="takeBack">Take back</button>
+        <button @click="newGame">New Game</button>
+        <button @click="resign">Resign</button>
+      </div>
     </div>
-    <button @click="takeBack">Take back</button>
-    <button @click="newGame">New Game</button>
-    <div v-if="checkmate">Game over</div>
   </main>
 </template>
 
 <script>
+//Components
 import Promotion from "@/components/Promotion.vue";
 import Tile from "@/components/Tile.vue";
 import Piece from "@/components/Piece.vue";
 import Files from "@/components/Files.vue";
 import Ranks from "@/components/Ranks.vue";
+import Notation from "@/components/Notation.vue";
+import Result from "@/components/Result.vue"
+
+//Libraries
 import getMoves from "@/lib/getMove";
 import makeMove from "@/lib/makeMove";
 import inCheck from "@/lib/inCheck";
@@ -45,8 +47,9 @@ import isCheck from "@/lib/isCheck";
 import isMate from "@/lib/isMate";
 import annotation from "@/lib/annotation";
 
+
 export default {
-  components: { Tile, Piece, Files, Ranks, Promotion },
+  components: { Tile, Piece, Files, Ranks, Promotion, Notation, Result },
   data() {
     return {
       board: [],
@@ -123,7 +126,11 @@ export default {
         return;
       }
 
-      if (isCheck(this.board, this.turn)) endNotation = "+";
+      console.log("check", isCheck(this.board, this.turn));
+
+      if (isCheck(this.board, this.turn)) {
+        endNotation = "+";
+      }
       if (isMate(this.turn, this.board)) {
         this.checkmate = true;
         endNotation = "#";
@@ -174,6 +181,9 @@ export default {
     isPossibleMove(rank, file) {
       return this.moves.some((move) => move[0] === rank && move[1] === file);
     },
+    resign() {
+      this.checkmate = true
+    }
   },
   computed() {
 
