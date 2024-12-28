@@ -125,8 +125,6 @@ export default {
         return;
       }
 
-      console.log("check", isCheck(this.board, this.turn));
-
       if (isCheck(this.board, this.turn)) {
         endNotation = "+";
       }
