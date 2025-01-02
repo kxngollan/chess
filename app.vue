@@ -4,6 +4,7 @@
       <Ranks class="rank" :ranks="ranks" />
       <div class="board">
         <Result v-if="checkmate" :positions="positions" />
+        <Draw v-if="draw" :drawType="drawType" />
         <Promotion v-if="promotion" :player="turn" :file="promotionFile" :rank="promotionRank"
           @makePromotion="makePromotion" />
         <div class="row" v-for="(row, rankIndex) in board" :key="rankIndex">
@@ -37,6 +38,7 @@ import Files from "@/components/Files.vue";
 import Ranks from "@/components/Ranks.vue";
 import Notation from "@/components/Notation.vue";
 import Result from "@/components/Result.vue"
+import Draw from "@/components/Draw.vue";
 
 //Libraries
 import getMoves from "@/lib/getMove";
@@ -44,11 +46,12 @@ import makeMove from "@/lib/makeMove";
 import inCheck from "@/lib/inCheck";
 import isCheck from "@/lib/isCheck";
 import isMate from "@/lib/isMate";
+import isDraw from "@/lib/isDraw";
 import annotation from "@/lib/annotation";
 
 
 export default {
-  components: { Tile, Piece, Files, Ranks, Promotion, Notation, Result },
+  components: { Tile, Piece, Files, Ranks, Promotion, Notation, Result, Draw },
   data() {
     return {
       board: [],
@@ -65,6 +68,8 @@ export default {
       promotionRank: null,
       promotion: false,
       checkmate: false,
+      draw: false,
+      drawType: null
     };
   },
   methods: {
@@ -85,6 +90,7 @@ export default {
       this.turn = "w";
       this.positions = [];
       this.checkmate = false;
+      this.draw = false
       this.createBoard();
       this.clear();
     },
@@ -135,6 +141,13 @@ export default {
 
       this.positions[this.positions.length - 1].notation = notation + endNotation;
 
+      let draw = isDraw(this.board, this.turn, this.positions)
+
+      if (draw.draw) {
+        this.draw = true
+        this.drawType = draw.type
+        this.positions.push({ position: this.board, notation: "1/2 - 1/2", })
+      }
 
       this.turn = this.turn === "w" ? "b" : "w";
 
@@ -145,8 +158,6 @@ export default {
       this.board[rank][file] = piece;
       const notation = "=" + piece[1].toUpperCase();
       let endNotation = "";
-
-
 
       if (isMate(this.turn, this.board)) {
         this.checkmate = true;
@@ -168,6 +179,11 @@ export default {
     },
     takeBack() {
       this.checkmate = false;
+      if (this.draw) {
+        this.draw = false
+        this.positions.pop();
+      }
+
       if (this.positions.length === 1) { return; }
       this.positions.pop();
       const lastPosition = this.positions[this.positions.length - 1];
