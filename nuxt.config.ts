@@ -9,4 +9,9 @@ export default defineNuxtConfig({
   },
   devtools: { enabled: true },
   modules: ["@nuxt/image", "@nuxt/icon"],
+  icon: {
+    serverBundle: {
+      collections: ["mdi", "fa"],
+    },
+  },
 });
