@@ -6,7 +6,7 @@
                 <Icon name="basil:cross-outline" />
             </button>
             <Loader v-if="loading" />
-            <div class="" v-else>
+            <div class="container" v-else>
                 <div v-if="games.length === 0" class="no-games">
                     <p>
                         No games found.
@@ -94,7 +94,11 @@ body {
     width: 100%;
     height: 100%;
     overflow: hidden;
+}
 
+.container {
+    height: calc(100% - 30px);
+    height: 100%;
 }
 
 img {
