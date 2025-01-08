@@ -1,8 +1,8 @@
 <template>
-    <dov class="container">
+    <div class="container">
 
         <div class="loader"></div>
-    </dov>
+    </div>
 </template>
 
 <style scoped>
