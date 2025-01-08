@@ -12,7 +12,7 @@
                         No games found.
                     </p>
                 </div>
-                <div v-for="game in games" :key="game.id" class="game-list">
+                <div v-for="game in games" :key="game.id" class="game-list" @click="selectGame(game)">
                     <p>
                         {{ game.white?.username }} ({{ game.white?.rating }})
                         <NuxtImg src="/img/wp.png" alt="White Player Icon" draggable="false" />
@@ -77,6 +77,9 @@ export default {
         previous() {
             this.$emit("previous");
         },
+        selectGame(game) {
+            this.$emit("selectGame", game);
+        },
     },
     mounted() {
         document.body.style.overflow = "hidden"
@@ -99,6 +102,7 @@ body {
 .container {
     height: calc(100% - 30px);
     height: 100%;
+    overflow-y: scroll;
 }
 
 img {
@@ -210,7 +214,7 @@ button {
     padding: 5px;
     border: 1px solid #ccc;
     border-radius: 5px;
-    width: 100%;
+    width: 95%;
     cursor: pointer;
 }
 

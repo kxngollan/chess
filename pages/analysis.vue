@@ -1,11 +1,9 @@
 <template>
     <main>
-        <GameForm class="form" @fetchGames="fetchGames" :month="month" :year="year" />
-        <Board class="board">
-        </Board>
-        <Notation />
+        <GameForm class="form" @fetchGames="fetchGames" :month="month" :year="year" v-if="searching" />
+        <Board />
         <GamesList v-if="showingGames" :games="games" :loading="loading" :month="month" :year="year"
-            @previous="previous" @next="next" @close="close" />
+            @previous="previous" @next="next" @close="close" @selectGame="selectGame" />
     </main>
 </template>
 
@@ -27,6 +25,8 @@ export default {
             loading: false,
             games: [],
             showingGames: false,
+            searching: true,
+            selectedGame: null,
         };
     },
     methods: {
@@ -66,6 +66,13 @@ export default {
                 this.loading = false;
             }
         },
+        selectGame(game) {
+            this.selectedGame = game;
+            this.showingGames = false;
+            this.searching = false;
+            console.log(game);
+        }
+        ,
         previous() {
             if (this.month === 1) {
                 this.month = 12;
