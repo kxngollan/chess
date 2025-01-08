@@ -22,9 +22,9 @@ export default {
             month: new Date().getMonth() + 1,
             year: currentYear,
             username: "",
-            loading: true,
+            loading: false,
             games: [],
-            showingGames: true,
+            showingGames: false,
         };
     },
     methods: {
