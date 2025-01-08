@@ -1,5 +1,5 @@
 <template>
-    <NuxtImg v-if="pieceImage" :src="pieceImage" :alt="piece"></NuxtImg>
+    <NuxtImg v-if="pieceImage" :src="pieceImage" :alt="piece" draggable="false"></NuxtImg>
 </template>
 
 <script>

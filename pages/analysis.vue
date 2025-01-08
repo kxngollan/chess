@@ -1,49 +1,42 @@
 <template>
-    <form @submit.prevent="getAnalysis">
-        <input type="text" id="username" v-model="username" placeholder="Enter username" />
-        <select v-model="month">
-            <option v-for="m in 12" :key="m" :value="m">
-                {{ String(m).padStart(2, "0") }}
-            </option>
-        </select>
-        <select v-model="year">
-            <option v-for="y in years" :key="y" :value="y">
-                {{ y }}
-            </option>
-        </select>
-        <button @click="getAnalysis">Submit</button>
-    </form>
-    <GamesList v-if="showingGames" :games="games" :loading="loading" @close="close" />
+    <GameForm @fetchGames="fetchGames" :month="month" :year="year" />
+    <Board class="">
+    </Board>
+    <Notation />
+    <GamesList v-if="showingGames" :games="games" :loading="loading" :month="month" :year="year" @previous="previous"
+        @next="next" @close="close" />
 </template>
 
 <script>
 import { Icon } from "@iconify/vue";
+import GameForm from "@/components/GameForm.vue";
 import GamesList from "@/components/GamesList.vue";
+import Board from "@/components/Board.vue";
+import Notation from "@/components/Notation.vue";
 
 export default {
-    components: { Icon, GamesList },
+    components: { Icon, GamesList, GameForm, Board, Notation },
     data() {
         const currentYear = new Date().getFullYear();
         return {
-            site: "chess.com",
-            username: "",
-            loading: false,
             month: new Date().getMonth() + 1,
             year: currentYear,
-            years: Array.from({ length: 10 }, (_, i) => currentYear - i),
+            username: "",
+            loading: true,
             games: [],
-            showingGames: false,
+            showingGames: true,
         };
     },
     methods: {
         close() {
             this.showingGames = false;
         },
-        async getAnalysis() {
-            if (!this.username) {
+        async fetchGames(username, month, year) {
+            if (!username) {
                 alert("Please enter a username.");
                 return;
             }
+            this.username = username;
             this.showingGames = true;
             this.loading = true;
             try {
@@ -51,9 +44,9 @@ export default {
                     method: "POST",
                     body: {
                         site: this.site,
-                        username: this.username,
-                        month: String(this.month).padStart(2, "0"),
-                        year: this.year,
+                        username: username,
+                        month: String(month).padStart(2, "0"),
+                        year: year,
                     },
                     headers: {
                         "Content-Type": "application/json",
@@ -70,6 +63,24 @@ export default {
             } finally {
                 this.loading = false;
             }
+        },
+        previous() {
+            if (this.month === 1) {
+                this.month = 12;
+                this.year -= 1;
+            } else {
+                this.month -= 1;
+            }
+            this.fetchGames(this.username, this.month, this.year);
+        },
+        next() {
+            if (this.month === 12) {
+                this.month = 1;
+                this.year += 1;
+            } else {
+                this.month += 1;
+            }
+            this.fetchGames(this.username, this.month, this.year);
         },
     },
     head() {

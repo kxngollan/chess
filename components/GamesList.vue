@@ -1,20 +1,24 @@
 <template>
     <div class="games">
         <div class="overlay" @click="close"></div>
-        <div class="modal">
-            <button @click="close">
+        <div class="modal" :class="{ loading: loading }">
+            <button class="close" @click="close">
                 <Icon name="basil:cross-outline" />
             </button>
-            <div v-if="loading" class="loading-text">Loading...</div>
-            <div v-else>
-                <div v-if="games.length === 0" class="no-games">No games found.</div>
+            <Loader v-if="loading" />
+            <div class="" v-else>
+                <div v-if="games.length === 0" class="no-games">
+                    <p>
+                        No games found.
+                    </p>
+                </div>
                 <div v-for="game in games" :key="game.id" class="game-list">
                     <p>
                         {{ game.white?.username }} ({{ game.white?.rating }})
-                        <img src=" /public/img/wp.png" alt="White Player Icon" draggable="false">
+                        <NuxtImg src="/img/wp.png" alt="White Player Icon" draggable="false" />
                         vs
                         {{ game.black?.username }} ({{ game.black?.rating }})
-                        <img src="/public/img/bp.png" alt="Black Player Icon" draggable="false">
+                        <NuxtImg src="/img/bp.png" alt="Black Player Icon" draggable="false" />
                     </p>
                     <span class="game-time" v-if="game.timeClass === 'bullet'">
                         <p>Bullet</p>
@@ -38,44 +42,64 @@
                     </span>
                 </div>
             </div>
+            <div class="controls">
+                <button @click="previous">
+                    <Icon name="fa-solid:chevron-left" />
+                </button>
+                <span>{{ months[month - 1] }} {{ year }}</span>
+                <span>{{ !loading ? games.length : "" }} Games</span>
+                <button @click="next">
+                    <Icon name="fa-solid:chevron-right" />
+                </button>
+            </div>
         </div>
     </div>
 </template>
 
 <script>
+import Loader from "@/components/Loader.vue";
 export default {
-    props: ["games", "loading"],
+    components: { Loader },
+    props: ["games", "loading", "month", "year"],
     data() {
         return {
-
+            months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
         };
     },
     methods: {
         close() {
-            console.log("close")
+            document.body.style.overflow = "auto";
             this.$emit("close");
         },
-        analysis(index) {
-            console.log(index)
-        }
+        next() {
+            this.$emit("next");
+        },
+        previous() {
+            this.$emit("previous");
+        },
+    },
+    mounted() {
+        document.body.style.overflow = "hidden"
+    },
+    beforeDestroy() {
+        document.body.style.overflow = "auto";
     },
 };
 </script>
 
 <style scoped>
+html,
 body {
-    position: relative;
     margin: 0;
-    font-family: Arial, sans-serif;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+
 }
 
 img {
-    width: 16px;
-    margin: 0;
-}
-
-p {
-    font-size: 16px;
+    width: 20px;
+    height: 20px;
 }
 
 .games {
@@ -90,28 +114,6 @@ p {
     z-index: 10;
 }
 
-button {
-    display: flex;
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background-color: transparent;
-    border: none;
-    height: 2rem;
-    width: 2rem;
-    font-size: 2rem;
-    cursor: pointer;
-    justify-content: center;
-    align-items: center;
-    border-radius: 100%;
-
-}
-
-button:hover {
-    background-color: salmon;
-    color: #555;
-}
-
 .overlay {
     position: fixed;
     top: 0;
@@ -119,26 +121,75 @@ button:hover {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.7);
-    z-index: -1;
+}
+
+.loading {
+    justify-content: center !important;
+    align-items: center !important;
+
+}
+
+.no-games {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
 }
 
 .modal {
     display: flex;
-    position: relative;
     flex-direction: column;
-    justify-content: flex-start;
+    position: relative;
+    bottom: 0;
+    justify-content: space-between;
     align-items: center;
-    gap: 20px;
     background-color: #ffffff;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     max-width: 400px;
-    min-width: 300px;
     width: 90%;
     height: 90vh;
     overflow-y: auto;
-    padding: 20px;
-    z-index: 1;
+    padding: 0px 25px 0;
+}
+
+.close {
+    position: absolute;
+    font-size: x-large;
+    top: 5px;
+    right: 5px;
+}
+
+button {
+    background-color: transparent;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 100%;
+    width: 30px;
+    height: 30px;
+}
+
+.close:hover {
+    color: #555;
+    background-color: salmon;
+}
+
+.controls {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    padding: 10px 0;
+    position: sticky;
+    bottom: 0;
+    background-color: #ffffff;
+    height: 30px;
+    margin: auto;
 }
 
 .loading-text,
@@ -152,23 +203,25 @@ button:hover {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    width: 280px;
-    gap: 8px;
-    padding: 15px;
+    padding: 5px;
     border: 1px solid #ccc;
     border-radius: 5px;
+    width: 100%;
+    cursor: pointer;
+}
+
+.game-list:first-child {
+    margin-top: 10px;
 }
 
 .game-list:hover {
-    background-color: #cfcccc;
-    cursor: pointer;
+    background-color: #f1f1f1;
 }
 
 .game-time {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5px;
     font-size: 14px;
 }
 </style>
