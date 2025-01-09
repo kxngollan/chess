@@ -1,10 +1,10 @@
-import { EvaluatedPosition } from "./Position";
+import type { EvaluatedPosition } from "./Position";
 
 export interface ParseRequestBody {
-    pgn?: string;
+  pgn?: string;
 }
 
 export interface ReportRequestBody {
-    positions?: EvaluatedPosition[],
-    captchaToken?: string
+  positions?: EvaluatedPosition[];
+  captchaToken?: string;
 }
