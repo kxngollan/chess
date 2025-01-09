@@ -33,7 +33,6 @@ export default {
     methods: {
         fetchGames() {
             this.username = this.username.trim();
-            console.log(this.username, this.month, this.year);
             this.$emit("fetchGames", this.username, this.month, this.year);
         }
     }

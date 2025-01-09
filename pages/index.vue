@@ -41,13 +41,13 @@ import Result from "@/components/Result.vue"
 import Draw from "@/components/Draw.vue";
 
 //Libraries
-import getMoves from "@/lib/getMove";
-import makeMove from "@/lib/makeMove";
-import inCheck from "@/lib/inCheck";
-import isCheck from "@/lib/isCheck";
-import isMate from "@/lib/isMate";
-import isDraw from "@/lib/isDraw";
-import annotation from "@/lib/annotation";
+import getMoves from "@/lib/frontend/getMove";
+import makeMove from "@/lib/frontend/makeMove";
+import inCheck from "@/lib/frontend/inCheck";
+import isCheck from "@/lib/frontend/isCheck";
+import isMate from "@/lib/frontend/isMate";
+import isDraw from "@/lib/frontend/isDraw";
+import annotation from "@/lib/frontend/annotation";
 
 
 export default {

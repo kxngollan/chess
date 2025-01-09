@@ -1,7 +1,19 @@
 <template>
     <main>
         <GameForm class="form" @fetchGames="fetchGames" :month="month" :year="year" v-if="searching" />
-        <Board />
+        <div>
+            <p>
+                {{ black ? black : "Black player" }} {{ blackRating ? `(${blackRating})` : "( ???? )" }}
+            </p>
+            <Board />
+            <p>
+                {{ white ? white : "White player" }} {{ whiteRating ? `(${whiteRating})` : "( ???? )" }}
+            </p>
+        </div>
+        <Notation2 :notation="notation" />
+        <button @click="getAnalys">
+            Analysis
+        </button>
         <GamesList v-if="showingGames" :games="games" :loading="loading" :month="month" :year="year"
             @previous="previous" @next="next" @close="close" @selectGame="selectGame" />
     </main>
@@ -12,10 +24,10 @@ import { Icon } from "@iconify/vue";
 import GameForm from "@/components/GameForm.vue";
 import GamesList from "@/components/GamesList.vue";
 import Board from "@/components/Board.vue";
-import Notation from "@/components/Notation.vue";
+import Notation2 from "@/components/Notation2.vue";
 
 export default {
-    components: { Icon, GamesList, GameForm, Board, Notation },
+    components: { Icon, GamesList, GameForm, Board, Notation2 },
     data() {
         const currentYear = new Date().getFullYear();
         return {
@@ -27,6 +39,12 @@ export default {
             showingGames: false,
             searching: true,
             selectedGame: null,
+            white: null,
+            black: null,
+            whiteRating: null,
+            blackRating: null,
+            positions: [],
+            notation: [],
         };
     },
     methods: {
@@ -61,7 +79,6 @@ export default {
                 this.games = res.games;
             } catch (err) {
                 console.error(err);
-                alert(err.message || "An error occurred while fetching games.");
             } finally {
                 this.loading = false;
             }
@@ -70,9 +87,39 @@ export default {
             this.selectedGame = game;
             this.showingGames = false;
             this.searching = false;
-            console.log(game);
+            this.white = game.white.username;
+            this.black = game.black.username;
+            this.whiteRating = game.white.rating;
+            this.blackRating = game.black.rating;
+            this.getPositions();
         }
         ,
+        async getPositions() {
+            try {
+                const res = await $fetch("/api/fetchPositions", {
+                    method: "POST",
+                    body: {
+                        pgn: this.selectedGame.pgn,
+                    },
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                });
+
+                if (res.status !== 200) {
+                    throw new Error(res.error || "Failed to fetch positions.");
+                }
+
+                this.positions = res.positions;
+                this.notation = res.notation;
+
+                if (res.status !== 200) {
+                    throw new Error(res.error || "Failed to fetch positions.");
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        },
         previous() {
             if (this.month === 1) {
                 this.month = 12;
@@ -102,6 +149,7 @@ export default {
 
 <style scoped>
 main {
+    margin-top: 20px;
     width: 100vw;
     height: 100vh;
     display: flex;
@@ -119,83 +167,3 @@ main {
     z-index: 1;
 }
 </style>
-
-.game-form {
-width: 100%;
-height: 100%;
-position: absolute;
-top: 0;
-left: 0;
-display: flex;
-justify-content: center;
-align-items: center;
-}
-
-.overlay {
-width: 100%;
-height: 100%;
-position: fixed;
-top: 0;
-left: 0;
-background-color: rgba(0, 0, 0, 0.5);
-}
-
-form {
-z-index: 1;
-background-color: white;
-padding: 2rem;
-border-radius: 0.75rem;
-box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-display: flex;
-flex-direction: column;
-gap: 1rem;
-max-width: 400px;
-width: 90%;
-}
-
-input,
-select {
-width: 100%;
-padding: 0.75rem;
-border: 1px solid #ccc;
-border-radius: 0.5rem;
-font-size: 1rem;
-outline: none;
-transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-}
-
-input:focus,
-select:focus {
-border-color: #007bff;
-box-shadow: 0 0 4px rgba(0, 123, 255, 0.5);
-}
-
-button {
-width: 100%;
-padding: 0.75rem;
-font-size: 1rem;
-font-weight: bold;
-color: white;
-background-color: #007bff;
-border: none;
-border-radius: 0.5rem;
-cursor: pointer;
-transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
-}
-
-button:hover {
-background-color: #0056b3;
-}
-
-button:active {
-transform: scale(0.95);
-}
-
-@media (max-width: 480px) {
-form {
-padding: 1.5rem;
-}
-button {
-font-size: 0.9rem;
-}
-}

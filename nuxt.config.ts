@@ -11,7 +11,7 @@ export default defineNuxtConfig({
   modules: ["@nuxt/image", "@nuxt/icon"],
   icon: {
     serverBundle: {
-      collections: ["mdi", "fa"],
+      collections: ["mdi", "fa", "material-symbols"],
     },
   },
 });
