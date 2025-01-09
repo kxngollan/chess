@@ -5,7 +5,7 @@
             <p>
                 {{ black ? black : "Black player" }} {{ blackRating ? `(${blackRating})` : "( ???? )" }}
             </p>
-            <Board />
+            <Board :board="board" />
             <p>
                 {{ white ? white : "White player" }} {{ whiteRating ? `(${whiteRating})` : "( ???? )" }}
             </p>
@@ -15,7 +15,7 @@
             Analysis
         </button>
         <GamesList v-if="showingGames" :games="games" :loading="loading" :month="month" :year="year"
-            @previous="previous" @next="next" @close="close" @selectGame="selectGame" />
+            @previous="previousMonth" @next="nextMonth" @close="close" @selectGame="selectGame" />
     </main>
 </template>
 
@@ -45,6 +45,8 @@ export default {
             blackRating: null,
             positions: [],
             notation: [],
+            positionIndex: 0,
+            board: []
         };
     },
     methods: {
@@ -120,7 +122,7 @@ export default {
                 console.error(err);
             }
         },
-        previous() {
+        previousMonth() {
             if (this.month === 1) {
                 this.month = 12;
                 this.year -= 1;
@@ -129,7 +131,7 @@ export default {
             }
             this.fetchGames(this.username, this.month, this.year);
         },
-        next() {
+        nextMonth() {
             if (this.month === 12) {
                 this.month = 1;
                 this.year += 1;
@@ -138,11 +140,46 @@ export default {
             }
             this.fetchGames(this.username, this.month, this.year);
         },
+        handleKeyDown(e) {
+            if (e.key === "ArrowRight") {
+                if (this.positionIndex >= this.positions.length - 1) {
+                    this.positionIndex = this.positions.length - 1;
+                } else {
+                    this.positionIndex += 1;
+                }
+            } else if (e.key === "ArrowLeft") {
+                if (this.positionIndex <= 0) {
+                    this.positionIndex = 0;
+                } else {
+                    this.positionIndex -= 1;
+                }
+            } else if (e.key === "ArrowUp") {
+                if (this.positionIndex !== 0) {
+                    this.positionIndex = 0;
+                }
+                this.positionIndex = 0;
+                this.board = this.positions[this.positionIndex];
+            } else if (e.key === "ArrowDown") {
+                if (this.positionIndex !== this.positions.length - 1) {
+                    this.positionIndex = this.positions.length - 1;
+                }
+            } else {
+                return;
+            }
+            console.log("Position Index", this.positionIndex);
+            console.log("Positions length", this.positions.length);
+        },
     },
     head() {
         return {
             title: "Analysis - Chess",
         };
+    },
+    mounted() {
+        window.addEventListener('keydown', this.handleKeyDown);
+    },
+    beforeDestroy() {
+        window.removeEventListener('keydown', this.handleKeyDown);
     },
 };
 </script>
