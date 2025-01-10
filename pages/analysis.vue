@@ -26,6 +26,10 @@ import GamesList from "@/components/GamesList.vue";
 import Board from "@/components/Board.vue";
 import Notation2 from "@/components/Notation2.vue";
 
+import makePosition from "~/lib/frontend/makePosition";
+import createBoard from "~/lib/frontend/createBoard";
+import playSound from "~/lib/frontend/playSound";
+
 export default {
     components: { Icon, GamesList, GameForm, Board, Notation2 },
     data() {
@@ -45,7 +49,7 @@ export default {
             blackRating: null,
             positions: [],
             notation: [],
-            positionIndex: 0,
+            positionIndex: null,
             board: []
         };
     },
@@ -93,6 +97,7 @@ export default {
             this.black = game.black.username;
             this.whiteRating = game.white.rating;
             this.blackRating = game.black.rating;
+            this.positionIndex = 0;
             this.getPositions();
         }
         ,
@@ -141,6 +146,9 @@ export default {
             this.fetchGames(this.username, this.month, this.year);
         },
         handleKeyDown(e) {
+            if (this.positionIndex === null) {
+                return;
+            }
             if (e.key === "ArrowRight") {
                 if (this.positionIndex >= this.positions.length - 1) {
                     this.positionIndex = this.positions.length - 1;
@@ -166,8 +174,15 @@ export default {
             } else {
                 return;
             }
-            console.log("Position Index", this.positionIndex);
-            console.log("Positions length", this.positions.length);
+
+            this.board = makePosition(this.positions[this.positionIndex]);
+
+            if (this.positionIndex < this.positions.length - 1 && this.positionIndex > -1) {
+                playSound(this.notation[this.positionIndex - 1]);
+            } else {
+                new Audio("/sounds/checkmate.mp3").play();
+            }
+
         },
     },
     head() {
@@ -177,6 +192,7 @@ export default {
     },
     mounted() {
         window.addEventListener('keydown', this.handleKeyDown);
+        this.board = createBoard();
     },
     beforeDestroy() {
         window.removeEventListener('keydown', this.handleKeyDown);

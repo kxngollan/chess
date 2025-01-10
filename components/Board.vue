@@ -22,30 +22,13 @@ import Ranks from "./Ranks.vue";
 
 export default {
     components: { Tile, Piece, },
+    props: ["board"],
     data() {
         return {
-            board: [],
             ranks: [8, 7, 6, 5, 4, 3, 2, 1],
             files: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
         }
     },
-    methods: {
-        createBoard() {
-            this.board = [
-                ["br", "bn", "bb", "bq", "bk", "bb", "bn", "br"],
-                Array(8).fill("bp"),
-                Array(8).fill(""),
-                Array(8).fill(""),
-                Array(8).fill(""),
-                Array(8).fill(""),
-                Array(8).fill("wp"),
-                ["wr", "wn", "wb", "wq", "wk", "wb", "wn", "wr"],
-            ];
-        }
-    },
-    mounted() {
-        this.createBoard();
-    }
 }
 </script>
 
