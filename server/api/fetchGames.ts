@@ -1,6 +1,3 @@
-import Result from "~/components/Result.vue";
-import pgnParser from "pgn-parser";
-
 export default defineEventHandler(async (event) => {
   try {
     const { site, username, year, month } = await readBody(event);
@@ -31,6 +28,7 @@ export default defineEventHandler(async (event) => {
         },
         timeClass: game["time_class"],
         pgn: game.pgn,
+        result: game["result"],
       });
     }
 
