@@ -1,7 +1,9 @@
 export default defineEventHandler(async (event) => {
   try {
-    const { site, username, year, month } = await readBody(event);
-    console.log(site);
+    const { timeControl, username, year, month } = await readBody(event);
+
+    if (!timeControl || !username || !year || !month) {
+    }
     const res = await fetch(
       `https://api.chess.com/pub/player/${username}/games/${year}/${month}`,
       { method: "GET" }
@@ -17,19 +19,21 @@ export default defineEventHandler(async (event) => {
     let gameList = [];
 
     for (let game of games) {
-      gameList.push({
-        white: {
-          username: game.white.username,
-          rating: game.white.rating.toString(),
-        },
-        black: {
-          username: game.black.username,
-          rating: game.black.rating.toString(),
-        },
-        timeClass: game["time_class"],
-        pgn: game.pgn,
-        result: game["result"],
-      });
+      if (timeControl === game["time_class"]) {
+        gameList.push({
+          white: {
+            username: game.white.username,
+            rating: game.white.rating.toString(),
+          },
+          black: {
+            username: game.black.username,
+            rating: game.black.rating.toString(),
+          },
+          timeClass: game["time_class"],
+          pgn: game.pgn,
+          result: game["result"],
+        });
+      }
     }
 
     return { success: true, games: gameList };

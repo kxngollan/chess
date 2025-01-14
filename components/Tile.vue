@@ -23,7 +23,7 @@ export default {
 </script>
 <style scoped>
 .tile {
-    width: 12.5%;
+    width: var(--tile);
     aspect-ratio: 1/1;
     display: flex;
     justify-content: center;

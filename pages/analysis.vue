@@ -1,78 +1,71 @@
 <template>
     <main>
         <GameForm class="form" @fetchGames="fetchGames" :month="month" :year="year" v-if="searching" />
-        <div>
-            <p>
-                {{ black ? black : "Black player" }} {{ blackRating ? `(${blackRating})` : "( ???? )" }}
-            </p>
-            <Board :board="board" />
-            <p>
-                {{ white ? white : "White player" }} {{ whiteRating ? `(${whiteRating})` : "( ???? )" }}
-            </p>
-        </div>
-        <Notation2 :notation="notation" />
-        <button @click="getAnalys">
-            Analysis
-        </button>
+        <Board :board="board" :blackplayer="blackplayer" :whiteplayer="whiteplayer" :flipped="flipped" />
+        <Panel :username="username" :timeControl="timeControl" @fetchGames="fetchGames" @reset-board="resetMove"
+            @previous-move="previousMove" @next-move="nextMove" @last-move="lastMove" @flip-board="flipBoard"
+            @update:username="username = $event" @update:time-control="timeControl = $event" :notation="notation"
+            :positionIndex="positionIndex" @change-index="changeIndex" />
         <GamesList v-if="showingGames" :games="games" :loading="loading" :month="month" :year="year"
             @previous="previousMonth" @next="nextMonth" @close="close" @selectGame="selectGame" />
     </main>
 </template>
 
 <script>
-import { Icon } from "@iconify/vue";
+
 import GameForm from "@/components/GameForm.vue";
 import GamesList from "@/components/GamesList.vue";
 import Board from "@/components/Board.vue";
-import Notation2 from "@/components/Notation2.vue";
+import Panel from "@/components/Panel.vue"
 
 import makePosition from "~/lib/frontend/makePosition";
 import createBoard from "~/lib/frontend/createBoard";
 import playSound from "~/lib/frontend/playSound";
 
 export default {
-    components: { Icon, GamesList, GameForm, Board, Notation2 },
+    components: { GamesList, GameForm, Board, Panel },
     data() {
         const currentYear = new Date().getFullYear();
+        const currentMonth = new Date().getMonth() + 1;
         return {
-            month: new Date().getMonth() + 1,
+            month: currentMonth,
             year: currentYear,
             username: "",
+            timeControl: "bullet",
             loading: false,
             games: [],
             showingGames: false,
-            searching: true,
+            searching: false,
             selectedGame: null,
-            white: null,
-            black: null,
-            whiteRating: null,
-            blackRating: null,
+            whiteplayer: { username: "White Player", rating: "???" },
+            blackplayer: { username: "Black Player", rating: "???" },
             positions: [],
             notation: [],
             positionIndex: null,
-            board: []
+            board: [],
+            flipped: false
         };
     },
     methods: {
         close() {
             this.showingGames = false;
         },
-        async fetchGames(username, month, year) {
-            if (!username) {
+        async fetchGames() {
+            if (!this.username) {
                 alert("Please enter a username.");
                 return;
             }
-            this.username = username;
             this.showingGames = true;
             this.loading = true;
+            this.games = []
             try {
                 const res = await $fetch("/api/fetchGames", {
                     method: "POST",
                     body: {
-                        site: this.site,
-                        username: username,
-                        month: String(month).padStart(2, "0"),
-                        year: year,
+                        timeControl: this.timeControl,
+                        username: this.username,
+                        month: String(this.month).padStart(2, "0"),
+                        year: this.year,
                     },
                     headers: {
                         "Content-Type": "application/json",
@@ -93,12 +86,11 @@ export default {
             this.selectedGame = game;
             this.showingGames = false;
             this.searching = false;
-            this.white = game.white.username;
-            this.black = game.black.username;
-            this.whiteRating = game.white.rating;
-            this.blackRating = game.black.rating;
+            this.whiteplayer = game.white
+            this.blackplayer = game.black
             this.positionIndex = 0;
             this.getPositions();
+
         }
         ,
         async getPositions() {
@@ -145,45 +137,65 @@ export default {
             }
             this.fetchGames(this.username, this.month, this.year);
         },
-        handleKeyDown(e) {
-            if (this.positionIndex === null) {
-                return;
-            }
-            if (e.key === "ArrowRight") {
-                if (this.positionIndex >= this.positions.length - 1) {
-                    this.positionIndex = this.positions.length - 1;
-                } else {
-                    this.positionIndex += 1;
-                }
-            } else if (e.key === "ArrowLeft") {
-                if (this.positionIndex <= 0) {
-                    this.positionIndex = 0;
-                } else {
-                    this.positionIndex -= 1;
-                }
-            } else if (e.key === "ArrowUp") {
-                if (this.positionIndex !== 0) {
-                    this.positionIndex = 0;
-                }
-                this.positionIndex = 0;
-                this.board = this.positions[this.positionIndex];
-            } else if (e.key === "ArrowDown") {
-                if (this.positionIndex !== this.positions.length - 1) {
-                    this.positionIndex = this.positions.length - 1;
-                }
+        nextMove() {
+            if (this.positionIndex === null || this.positions.length < 0) return;
+            if (this.positionIndex >= this.positions.length - 1) {
+                this.positionIndex = this.positions.length - 1;
             } else {
-                return;
+                this.positionIndex += 1;
             }
-
+            this.changeBoard()
+        },
+        previousMove() {
+            if (this.positionIndex === null || this.positions.length < 0) return;
+            if (this.positionIndex <= 0) {
+                this.positionIndex = 0;
+            } else {
+                this.positionIndex -= 1;
+            }
+            this.changeBoard()
+        },
+        lastMove() {
+            if (this.positionIndex === null || this.positions.length < 0) return;
+            if (this.positionIndex !== this.positions.length - 1) {
+                this.positionIndex = this.positions.length - 1;
+            }
+            this.changeBoard()
+        },
+        resetMove() {
+            if (this.positionIndex === null || this.positions.length < 0) return;
+            if (this.positionIndex !== 0) {
+                this.positionIndex = 0;
+            }
+            this.changeBoard()
+        },
+        flipBoard() {
+            this.flipped = !this.flipped
+        },
+        handleKeyDown(e) {
+            if (e.key === "ArrowRight") {
+                this.nextMove()
+            } else if (e.key === "ArrowLeft") {
+                this.previousMove()
+            } else if (e.key === "ArrowUp") {
+                this.resetMove()
+            } else if (e.key === "ArrowDown") {
+                this.lastMove()
+            } else if (e.key === "Escape"
+            ) {
+                return this.close()
+            }
+        },
+        changeBoard() {
             this.board = makePosition(this.positions[this.positionIndex]);
-
             if (this.positionIndex < this.positions.length - 1 && this.positionIndex > -1) {
                 playSound(this.notation[this.positionIndex - 1]);
-            } else {
-                new Audio("/sounds/checkmate.mp3").play();
             }
-
         },
+        changeIndex(index) {
+            this.positionIndex = index
+            return this.changeBoard()
+        }
     },
     head() {
         return {
@@ -208,6 +220,7 @@ main {
     display: flex;
     justify-content: center;
     align-items: center;
+    gap: 30px;
 }
 
 .board {
@@ -218,5 +231,14 @@ main {
 .form {
     position: absolute;
     z-index: 1;
+}
+
+
+@media only screen and (max-width: 960px) {
+    main {
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+    }
 }
 </style>

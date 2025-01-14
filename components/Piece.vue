@@ -17,6 +17,11 @@ export default {
 </script>
 
 <style scoped>
+img {
+    max-width: 90%;
+    object-fit: contain;
+}
+
 img:hover {
     cursor: pointer;
 }

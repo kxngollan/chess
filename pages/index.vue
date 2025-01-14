@@ -1,7 +1,7 @@
 <template>
     <main>
         <div class="play">
-            <Ranks class="rank" :ranks="ranks" />
+            <!-- <Ranks class="rank" :ranks="ranks" /> -->
             <div class="board">
                 <Result v-if="checkmate" :positions="positions" />
                 <Draw v-if="draw" :drawType="drawType" />
@@ -16,7 +16,7 @@
                     </Tile>
                 </div>
             </div>
-            <Files class="file" :files="files" />
+            <!-- <Files class="file" :files="files" /> -->
         </div>
         <div class="controls">
             <Notation :positions="positions" />

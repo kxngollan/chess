@@ -1,6 +1,5 @@
 <template>
     <div class="container">
-
         <div class="loader"></div>
     </div>
 </template>
@@ -10,7 +9,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100%;
+    height: 200px;
     width: 100%;
 }
 
@@ -26,13 +25,13 @@
 .loader::after {
     content: "";
     grid-area: 1/1;
-    background: #f77825;
+    background: #000000;
     animation: inherit;
     animation-name: l4-1;
 }
 
 .loader::after {
-    background: #60B99A;
+    background: antiquewhite;
     --s: 60deg;
 }
 

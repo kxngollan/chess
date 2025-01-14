@@ -1,12 +1,12 @@
 <template>
     <div class="notation">
-        <p v-for="(position, index) in positions.filter((_, idx) => idx > 0)" :key="index" v-if="positions.length > 0"
-            ref="positionRefs">
-            <span v-if="index % 2 === 0">
-                {{ Math.ceil(position.turn / 2) }}.
+        <p v-for="(n, index) in positions" :key="index" v-if="positions.length > 0" @click="changeIndex(index)"
+            autofocus>
+            <span>
+                {{ Math.ceil((index + 1) / 2) }}.
             </span>
-            <span :class="index === positions.length - 2 ? 'moved' : ''">
-                {{ position.notation }}
+            <span :class="index === positionIndex - 1 ? 'moved' : ''">
+                {{ n }}
             </span>
         </p>
     </div>
@@ -19,13 +19,14 @@ export default {
         positions: {
             type: Array,
             default: () => []
-        }
+        },
+        notation: Array,
+        positionIndex: Number
     },
-    updated() {
-        const positionRefs = this.$refs.positionRefs;
-        if (positionRefs && positionRefs.length > 0) {
-            const lastElement = positionRefs[positionRefs.length - 1];
-            lastElement.scrollIntoView({ behavior: "smooth", block: "center" });
+    emits: ["changeIndex"],
+    methods: {
+        changeIndex(index) {
+            this.$emit("changeIndex", index + 1)
         }
     }
 };
@@ -35,18 +36,15 @@ export default {
 <style scoped>
 .notation {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-auto-rows: min-content;
-    gap: 10px;
-    height: 400px;
-    width: 200px;
-    padding: 10px;
+    grid-template-columns: repeat(2, 1fr);
+    padding: 3px 20px;
+    width: 90%;
+    height: 420px;
+    max-height: 420px;
     overflow-y: auto;
-    font-size: 1.2em;
-    color: #333;
-    border: 1px solid #ccc;
+    background-color: var(--primary-color);
+    color: white;
     border-radius: 10px;
-    background-color: #fff;
 }
 
 .notation p {
@@ -54,7 +52,23 @@ export default {
     padding: 5px;
     font-family: 'Arial', sans-serif;
     display: flex;
-    gap: 5px;
+    align-items: center;
+    justify-content: start;
+    font-size: large;
+    gap: 2px;
+    word-wrap: normal;
+    white-space: normal;
+    width: calc(48%-5px);
+    height: 20px;
+    padding: 2px;
+    border: 3px solid var(--primary-color);
+    margin-bottom: 3px;
+    border-radius: 3px;
+}
+
+p:hover {
+    cursor: pointer;
+    border: 3px solid #4caf50;
 }
 
 .notation span {
