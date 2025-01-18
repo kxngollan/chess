@@ -1,7 +1,7 @@
 <template>
     <form class="input-container" @submit.prevent="fetchGames">
         <div id="gameInputContainer" class="gameInputContainer">
-            <input id="username-input" class="white" autofill="false" spellcheck="false" maxlength="48"
+            <input id="username-input" class="white" autocomplete="off" spellcheck="false" maxlength="48"
                 placeholder="Username..." v-model="localUsername" />
             <button type="submit" id="fetch-account-games-button" class="usernameVerifyBtn">
                 <Icon name="material-symbols:arrow-forward-ios"

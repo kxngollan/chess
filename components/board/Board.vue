@@ -6,6 +6,10 @@
                 ({{ flipped ? whiteplayer.rating : blackplayer.rating }})
             </div>
             <div id="board">
+                <Result v-if="checkmate" :positions="positions" />
+                <Draw v-if="draw" :drawType="drawType" />
+                <Promotion v-if="promotion" :player="turn" :file="promotionFile" :rank="promotionRank"
+                    @makePromotion="makePromotion" />
                 <div class="row" v-for="(row, rankIndex) in visualBoard" :key="rankIndex">
                     <Tile v-for="(tile, fileIndex) in row" :key="fileIndex"
                         :color="(rankIndex + fileIndex) % 2 === 0 ? 'white' : 'black'" :tile="tile" :file="fileIndex"
@@ -26,10 +30,31 @@
 <script>
 import Tile from './Tile.vue';
 import Piece from './Piece.vue';
+import Promotion from './Promotion.vue';
+import Draw from './Draw.vue';
+import Result from './Result.vue';
+
 
 export default {
-    components: { Tile, Piece },
-    props: ["board", "blackplayer", "whiteplayer", "flipped"],
+    components: { Tile, Piece, Promotion, Draw, Result },
+    props: {
+        board: {
+            type: Array,
+            default: () => []
+        },
+        blackplayer: {
+            type: Object,
+            default: () => ({})
+        },
+        whiteplayer: {
+            type: Object,
+            default: () => ({})
+        },
+        flipped: {
+            type: Boolean,
+            default: false
+        }
+    },
     computed: {
         visualBoard() {
             if (this.flipped) {

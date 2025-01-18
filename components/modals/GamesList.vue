@@ -31,7 +31,7 @@
 <script>
 import { Icon } from "@iconify/vue";
 import TimeControl from './TimeControl.vue';
-import Loader from "./Loader.vue";
+import Loader from "../Loader.vue";
 
 export default {
     props: ["year", "month", "games", "loading"],

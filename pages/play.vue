@@ -1,76 +1,25 @@
 <template>
     <main>
-        <div class="play">
-            <div class="board">
-                <Result v-if="checkmate" :positions="positions" />
-                <Draw v-if="draw" :drawType="drawType" />
-                <Promotion v-if="promotion" :player="turn" :file="promotionFile" :rank="promotionRank"
-                    @makePromotion="makePromotion" />
-                <div class="row" v-for="(row, rankIndex) in board" :key="rankIndex">
-                    <Tile v-for="(tile, fileIndex) in row" :key="fileIndex"
-                        :color="((rankIndex + fileIndex) % 2 === 0) ? 'white' : 'black'" @clearMoves="clear"
-                        :tile="tile" :file="fileIndex" :rank="rankIndex"
-                        :possibleMove="isPossibleMove(rankIndex, fileIndex)" @makeMove="makeMove">
-                        <Piece v-if="tile" :piece="tile" @click="getMoves(board, rankIndex, fileIndex, tile)" />
-                    </Tile>
-                </div>
-            </div>
-        </div>
-        <div class="controls">
-            <Notation :positions="positions" />
-            <div class="buttons">
-                <button @click="takeBack">Take back</button>
-                <button @click="resign">Resign</button>
-                <button @click="newGame">New Game</button>
-            </div>
-        </div>
+        <Board :board="board" :blackplayer="blackplayer" :whiteplayer="whiteplayer" />
     </main>
 </template>
 
 <script>
-//Components
-import Promotion from "@/components/board/Promotion.vue";
-import Tile from "~/components/board/Tile.vue";
-import Piece from "~/components/board/Piece.vue";
-import Files from "@/components/board/Files.vue";
-import Ranks from "~/components/board/Ranks.vue";
-import Notation from "~/components/panel/Notation.vue";
-import Result from "~/components/board/Result.vue"
-import Draw from "~/components/board/Draw.vue";
-
-//Libraries
-import getMoves from "@/lib/frontend/getMove";
-import makeMove from "@/lib/frontend/makeMove";
-import inCheck from "@/lib/frontend/inCheck";
-import isCheck from "@/lib/frontend/isCheck";
-import isMate from "@/lib/frontend/isMate";
-import isDraw from "@/lib/frontend/isDraw";
-import annotation from "@/lib/frontend/annotation";
+import Board from "@/components/board/Board.vue";
+import Panel from "@/components/panel/Panel.vue";
+import createBoard from "@/lib/frontend/createBoard";
 
 
 export default {
-    components: { Tile, Piece, Files, Ranks, Promotion, Notation, Result, Draw },
+    component: { Board, Panel },
     data() {
         return {
             board: [],
-            ranks: [8, 7, 6, 5, 4, 3, 2, 1],
-            files: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
-            turn: "w",
-            moves: [],
-            positions: [],
-            notation: [],
-            piece: null,
-            rank: null,
-            file: null,
-            promotionFile: null,
-            promotionRank: null,
-            promotion: false,
-            checkmate: false,
-            draw: false,
-            drawType: null
-        };
-    },
-    methods: {
+            whiteplayer: { username: "White Player", rating: "???" },
+            blackplayer: { username: "Black Player", rating: "???" },
+            flipped: false
+        }
+    }, methods: {
         createBoard() {
             this.board = [
                 ["br", "bn", "bb", "bq", "bk", "bb", "bn", "br"],
@@ -196,97 +145,10 @@ export default {
             this.checkmate = true
         }
     },
-    computed() {
-
-    },
     mounted() {
-        this.createBoard();
-    },
-};
+        this.board = createBoard()
+    }
+}
 </script>
 
-
-
-<style scoped>
-body {
-    margin: 0;
-    padding: 0;
-}
-
-main {
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.play {
-    position: relative;
-}
-
-.board {
-    width: 720px;
-    position: relative;
-    aspect-ratio: 1 / 1;
-    display: flex;
-    flex-direction: column;
-    border-radius: 16px;
-    overflow: hidden;
-}
-
-.file {
-    position: absolute;
-    bottom: -20px;
-}
-
-.rank {
-    position: absolute;
-    left: -20px;
-}
-
-.row {
-    display: flex;
-    flex: 1;
-}
-
-.controls {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    height: 680px;
-    padding: 20px;
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 15px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    margin-left: 10px;
-}
-
-.buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.buttons button {
-    padding: 10px 20px;
-    font-size: 1em;
-    font-weight: bold;
-    color: #fff;
-    background-color: #007bff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.buttons button:hover {
-    background-color: #0056b3;
-}
-
-.buttons button:active {
-    background-color: #003d80;
-}
-</style>
+<style></style>

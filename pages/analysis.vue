@@ -1,6 +1,5 @@
 <template>
     <main>
-        <GameForm class="form" @fetchGames="fetchGames" :month="month" :year="year" v-if="searching" />
         <Board :board="board" :blackplayer="blackplayer" :whiteplayer="whiteplayer" :flipped="flipped" />
         <Panel :username="username" :timeControl="timeControl" @fetchGames="fetchGames" @reset-board="resetMove"
             @previous-move="previousMove" @next-move="nextMove" @last-move="lastMove" @flip-board="flipBoard"
@@ -12,18 +11,16 @@
 </template>
 
 <script>
-
-import GameForm from "@/components/GameForm.vue";
-import GamesList from "@/components/GamesList.vue";
-import Board from "@/components/Board.vue";
-import Panel from "@/components/Panel.vue"
+import GamesList from "@/components/modals/GamesList.vue";
+import Board from "@/components/board/Board.vue";
+import Panel from "@/components/panel/Panel.vue"
 
 import makePosition from "~/lib/frontend/makePosition";
 import createBoard from "~/lib/frontend/createBoard";
 import playSound from "~/lib/frontend/playSound";
 
 export default {
-    components: { GamesList, GameForm, Board, Panel },
+    components: { GamesList, Board, Panel },
     data() {
         const currentYear = new Date().getFullYear();
         const currentMonth = new Date().getMonth() + 1;
@@ -35,7 +32,6 @@ export default {
             loading: false,
             games: [],
             showingGames: false,
-            searching: false,
             selectedGame: null,
             whiteplayer: { username: "White Player", rating: "???" },
             blackplayer: { username: "Black Player", rating: "???" },
@@ -85,7 +81,6 @@ export default {
         selectGame(game) {
             this.selectedGame = game;
             this.showingGames = false;
-            this.searching = false;
             this.whiteplayer = game.white
             this.blackplayer = game.black
             this.positionIndex = 0;
@@ -212,33 +207,4 @@ export default {
 };
 </script>
 
-<style scoped>
-main {
-    margin-top: 20px;
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 30px;
-}
-
-.board {
-    position: relative;
-    z-index: 0;
-}
-
-.form {
-    position: absolute;
-    z-index: 1;
-}
-
-
-@media only screen and (max-width: 960px) {
-    main {
-        display: flex;
-        flex-direction: column;
-        justify-content: start;
-    }
-}
-</style>
+<style scoped></style>

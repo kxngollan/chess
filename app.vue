@@ -17,6 +17,24 @@ body {
   width: 100vw;
 }
 
+main {
+  margin-top: 20px;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+}
+
+@media only screen and (max-width: 960px) {
+  main {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+  }
+}
+
 @media only screen and (max-width: 1536px) {
   :root {
     --tile: calc(511.2px/8)

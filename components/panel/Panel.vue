@@ -29,7 +29,7 @@ import Depth from "./Depth.vue";
 import Notation from "./Notation.vue";
 
 export default {
-    components: { UsernameInput, Control, Depth },
+    components: { UsernameInput, Control, Depth, Notation },
     props: {
         username: String,
         timeControl: String,
@@ -167,8 +167,6 @@ export default {
         font-size: 27px;
     }
 }
-
-
 
 #review-button {
     display: flex;
